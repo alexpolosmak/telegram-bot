@@ -28,16 +28,16 @@ class CityHandler
 
     }
 
-    private function getCityFromUpdateData(){
-        $updates=$this->bot->getUpdates();
-
-        for ($i=count($updates)-1;$i>0;$i--){
-            if($updates[$i]["message"]["text"]=="/city"){
-               return $updates[$i-1]["message"];
-            }
-        }
-
-    }
+//    private function getCityFromUpdateData(){
+//        //$updates=$this->bot->getUpdates();
+//
+//        for ($i=count($updates)-1;$i>0;$i--){
+//            if($updates[$i]["message"]["text"]=="/city"){
+//               return $updates[$i-1]["message"];
+//            }
+//        }
+//
+//    }
 
 
 }

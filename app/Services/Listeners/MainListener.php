@@ -45,7 +45,7 @@ class MainListener
         $this->requestsAboutCities = $requestsAboutCities;
         $this->userService = $userService;
         $this->bot = (new BotInstance())->getBot();
-      //  $this->messages = $this->bot->getUpdates();
+        $this->messages = $this->bot->getWebhookUpdate();
         $this->requestsAboutCompanyItems = $requestsAboutCompanyItems;
         $this->categoriesByCompanySender = $categoriesByCompanySender;
         $this->nameItemConvertor=$nameItemConvertor;
