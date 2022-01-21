@@ -21,9 +21,10 @@ use Telegram\Bot\Exceptions\TelegramSDKException;
 class TelegramControler extends Controller
 {
     private $mainListener;
+
     public function __construct(MainListener $mainListener)
     {
-        $this->mainListener=$mainListener;
+        $this->mainListener = $mainListener;
     }
 
     /**
@@ -33,35 +34,23 @@ class TelegramControler extends Controller
      */
     public function update(Request $request)
     {
-
-
         $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
-        Cache::put("data",$request->all());
-       // dd($request->all());
+        Cache::put("data", $request->all());
+        Cache::put("data1", $telegram->getWebhookUpdate());
+        // dd($request->all());
         $telegram->addCommand(StartCommand::class);
         $telegram->addCommand(GetContactCommand::class);
         $telegram->addCommand(CityCommand::class);
-       $telegram->addCommand(CreateOrderCommand::class);
+        $telegram->addCommand(CreateOrderCommand::class);
         $telegram->addCommand(GetAddressCompanyCommand::class);
         $telegram->commandsHandler(false);
         $this->mainListener->listen();
-
-
-//        $response = $telegram->sendMessage([
-//            "chat_id"=>924608003,
-//            "text"=>"hello i am BotSdk"
-//        ]);
-
-//        $botId = $response->getId();
-//        $firstName = $response->getFirstName();
-//        $username = $response->getUsername();
     }
 
-    public function getUpdate()
-    {
-        $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
-        // dd( $telegram->getUpdates(["message"],false));
-        $telegram->getUpdates();
-
-    }
+//    public function getUpdate()
+//    {
+//        $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
+//        $telegram->getUpdates();
+//
+//    }
 }

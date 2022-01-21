@@ -16,5 +16,5 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::get("/bot/update",[\App\Http\Controllers\TelegramControler::class,"update"]);
-Route::post("/bot/updates",[\App\Http\Controllers\TelegramControler::class,"getUpdate"]);
+Route::post("/bot/update",[\App\Http\Controllers\TelegramControler::class,"update"]);
+//Route::post("/bot/updates",[\App\Http\Controllers\TelegramControler::class,"getUpdate"]);
