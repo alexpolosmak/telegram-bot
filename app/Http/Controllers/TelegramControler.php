@@ -35,6 +35,8 @@ class TelegramControler extends Controller
     public function update(Request $request)
     {
         $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
+        mail("alexpolosmak@ukr.net","data from telegram request","hello");
+        mail("alexpolosmak@ukr.net","data from telegram request",(string)$telegram->getWebhookUpdate());
        // $telegram->addCommand(StartCommand::class);
         //$telegram->addCommand(GetContactCommand::class);
         $telegram->addCommand(CityCommand::class);
