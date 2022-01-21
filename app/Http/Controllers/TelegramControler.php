@@ -13,6 +13,7 @@ use App\Services\Listeners\MainListener;
 
 use http\Message;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Telegram\Bot\Api;
 use Telegram\Bot\Exceptions\TelegramSDKException;
@@ -35,8 +36,8 @@ class TelegramControler extends Controller
 
 
         $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
-        Log::info("request data",$request->all());
-        dd($request->all());
+        Cache::put("data",$request->all());
+       // dd($request->all());
         $telegram->addCommand(StartCommand::class);
         $telegram->addCommand(GetContactCommand::class);
         $telegram->addCommand(CityCommand::class);
