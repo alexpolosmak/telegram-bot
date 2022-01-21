@@ -43,7 +43,7 @@ class TelegramControler extends Controller
         $telegram->addCommand(CityCommand::class);
         $telegram->addCommand(CreateOrderCommand::class);
         $telegram->addCommand(GetAddressCompanyCommand::class);
-        $telegram->commandsHandler(false);
+        $telegram->commandsHandler(true);
         $this->mainListener->listen();
     }
 
