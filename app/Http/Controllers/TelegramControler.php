@@ -35,14 +35,12 @@ class TelegramControler extends Controller
     public function update(Request $request)
     {
         $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
-        Cache::put("data", $request->all());
-        Cache::put("data1", $telegram->getWebhookUpdate());
-        // dd($request->all());
         $telegram->addCommand(StartCommand::class);
         $telegram->addCommand(GetContactCommand::class);
         $telegram->addCommand(CityCommand::class);
         $telegram->addCommand(CreateOrderCommand::class);
         $telegram->addCommand(GetAddressCompanyCommand::class);
+        Cache::put("request",$request->all());
         $telegram->commandsHandler(true);
         $this->mainListener->listen();
     }
