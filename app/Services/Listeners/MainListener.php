@@ -61,6 +61,7 @@ class MainListener
 
             if (array_key_exists("contact", $message["message"])) {
                 $this->userService->store($message);
+                return;
             }
             $this->textIsCity($message);
             $this->textIsCompany($message);
