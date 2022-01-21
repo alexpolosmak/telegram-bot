@@ -32,7 +32,7 @@ class TelegramControler extends Controller
     public function update()
     {
 
-
+dd("hello");
         $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
         $telegram->addCommand(StartCommand::class);
         $telegram->addCommand(GetContactCommand::class);
