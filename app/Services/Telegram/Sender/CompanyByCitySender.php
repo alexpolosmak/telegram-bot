@@ -34,6 +34,6 @@ class CompanyByCitySender
             "text" => "Chose dishes and touch on appropriate buttons",
             'reply_markup' => $reply_markup,
         ]);
-
+//return true;
     }
 }

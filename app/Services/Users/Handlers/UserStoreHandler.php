@@ -15,7 +15,7 @@ class UserStoreHandler
 
     public function handle($message)
     {
-       return $this->userRepository->store( $message["message"]["contact"]);
+       return $this->userRepository->store( $message);
     }
 
 }

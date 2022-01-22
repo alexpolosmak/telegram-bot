@@ -27,6 +27,7 @@ class UserRepository
             "company" => "",
             "items" => []
         ]);
+        return $user!=null ;
 
     }
 
@@ -47,7 +48,7 @@ class UserRepository
         if(array_key_exists("addressCompany",$cartUser)){
             $cartUser["addressCompany"]="";
         }
-        Cache::put($cartID, $cartUser);
+       return Cache::put($cartID, $cartUser);
     }
 
 

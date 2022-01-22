@@ -8,6 +8,9 @@ use App\Services\Users\Handlers;
 use App\Services\Users\Handlers\UserStoreHandler;
 use App\Services\Users\Repositories\UserRepository;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
+
 class UserService implements UserServiceInterface
 {
     private $userRepository;
@@ -29,12 +32,14 @@ class UserService implements UserServiceInterface
 
     public function store($data)
     {
-
+        Cache::put("not_exist", $data);
         if (!($this->exist($data))) {
-            $this->userStoreHandler->handle($data);
+            Cache::put("exist", $data);
+            Log::info("i am in exist", ["exist"]);
+            return $this->userStoreHandler->handle($data);
         }
 
-        $this->clearCart($data);
+        return $this->clearCart($data);
 
 
     }
@@ -47,6 +52,7 @@ class UserService implements UserServiceInterface
     public function exist($data)
     {
         $chat_id = $this->userExistHandler->handle($data);
+        Cache::put("chat_id", $data);
         return $this->userRepository->find($chat_id);
     }
 
@@ -56,6 +62,6 @@ class UserService implements UserServiceInterface
         $user = User::getUser($chat_id);
 //dd($user);
 
-        $this->userRepository->CleanCartUser($user[0]["cart_id"]);
+        return $this->userRepository->CleanCartUser($user[0]["cart_id"]);
     }
 }

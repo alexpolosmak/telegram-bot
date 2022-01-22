@@ -36,7 +36,7 @@ class MainListener
         CompanyByCitySender       $companyByCitySender,
         RequestsAboutCompanyItems $requestsAboutCompanyItems,
         CategoriesByCompanySender $categoriesByCompanySender,
-        NameItemConvertor $nameItemConvertor
+        NameItemConvertor         $nameItemConvertor
     )
     {
         $this->companyByCitySender = $companyByCitySender;
@@ -45,83 +45,113 @@ class MainListener
         $this->requestsAboutCities = $requestsAboutCities;
         $this->userService = $userService;
         $this->bot = (new BotInstance())->getBot();
+        Cache::put("bot", $this->bot->getWebhookUpdate());
         $this->messages = $this->bot->getWebhookUpdate();
+
         $this->requestsAboutCompanyItems = $requestsAboutCompanyItems;
         $this->categoriesByCompanySender = $categoriesByCompanySender;
-        $this->nameItemConvertor=$nameItemConvertor;
+        $this->nameItemConvertor = $nameItemConvertor;
     }
 
     public function listen()
     {
-        foreach ($this->messages as $message) {
+        Cache::put("mess1", $this->messages);
+        Cache::put("mess123", "123");
+        if ($this->textIsItem($this->messages)) {
 
-            if ($this->textIsItem($message)) {
-                return;
-            }
+            return true;
+        }
+        Cache::put("arround", $this->messages);
+        $message = $this->messages["message"];
+        //   $message = (array)$message;
 
-            if (array_key_exists("contact", $message["message"])) {
-                $this->userService->store($message);
-                return;
-            }
-            $this->textIsCity($message);
-            $this->textIsCompany($message);
-            $this->textIsCategory($message);
-            $this->textIsAddress($message);
+
+        if (array_key_exists("contact", $message)) {
+
+            return $this->userService->store($message["contact"]);
+        }
+        if ($this->textIsCity($message)) {
+            return true;
+        }
+        if ($this->textIsCompany($message)) {
+            return true;
+        }
+        if ($this->textIsCategory($message)) {
+            return true;
+        }
+        if ($this->textIsAddress($message)) {
+            return true;
         }
 
+//        $this->textIsAddress($message);
 
+        return true;
     }
 
     private function textIsCity($message)
-    {
-        if (in_array($message["message"]["text"], $this->requestsAboutCities->getCitiesListAsArray())) {
-            $user = User::query()->where("chat_id", "=", $message["message"]["chat"]["id"])->get();
+    { //Cache::put("city",$message);
+        Cache::put("cities", $this->requestsAboutCities->getCitiesListAsArray());
+        Cache::put("data2", $message["text"]);
+        if (in_array($message["text"], $this->requestsAboutCities->getCitiesListAsArray())) {
+            Cache::put("city12", $message["text"]);
+            $user = User::query()->where("chat_id", "=", $message["chat"]["id"])->get();
             $cartId = ($user->toArray())[0]["cart_id"];
             $cart = Cache::get($cartId);
-            $cart["town"] = $message["message"]["text"];
+            $cart["town"] = $message["text"];
             Cache::put($cartId, $cart);
-            $this->companyByCitySender->sendCompaniesListByCity($message["message"]["text"], $message["message"]["chat"]["id"]);
+            Cache::put("id", $message["chat"]["id"]);
+            Cache::put("town", $message["text"]);
+
+            $this->companyByCitySender->sendCompaniesListByCity($message["text"], $message["chat"]["id"]);
+            return true;
         }
+        return false;
     }
 
     private function textIsCompany($message)
     {
-        $user = $this->getUser($message["message"]["chat"]["id"])[0];
+        $user = $this->getUser($message["chat"]["id"])[0];
         $cartUser = Cache::get($user["cart_id"]);
-        if (in_array($message["message"]["text"], $this->requestsAboutCompanies->getCompaniesListAsArrayByCity($cartUser["town"]))) {
-            $cartUser["company"] = $message["message"]["text"];
+        if (in_array($message["text"], $this->requestsAboutCompanies->getCompaniesListAsArrayByCity($cartUser["town"]))) {
+            $cartUser["company"] = $message["text"];
             Cache::put($user["cart_id"], $cartUser);
-            $this->categoriesByCompanySender->sendCategoriesByCompany($this->getCompanyIdByName($message["message"]["text"], $cartUser["town"]), $user["chat_id"]);
+            $this->categoriesByCompanySender->sendCategoriesByCompany($this->getCompanyIdByName($message["text"], $cartUser["town"]), $user["chat_id"]);
+            return true;
         }
     }
 
     public function textIsCategory($message)
     {
-        $user = $this->getUser($message["message"]["chat"]["id"])[0];
+        $user = $this->getUser($message["chat"]["id"])[0];
         $cartUser = Cache::get($user["cart_id"]);
         //  dd($this->requestsAboutCompanies->getCityId($cartUser["town"]));
-       // dd($this->getCompanyIdByName($cartUser["company"], $cartUser["town"]));
-      //  dd( $this->requestsAboutCompanyItems->getNamesOfCategories($this->requestsAboutCompanies->getCityId($cartUser["town"])));
-        if (in_array($message["message"]["text"], $this->requestsAboutCompanyItems->getNamesOfCategories($this->getCompanyIdByName($cartUser["company"], $cartUser["town"])))) {
-            $categoryName = $message["message"]["text"];
+        // dd($this->getCompanyIdByName($cartUser["company"], $cartUser["town"]));
+        //  dd( $this->requestsAboutCompanyItems->getNamesOfCategories($this->requestsAboutCompanies->getCityId($cartUser["town"])));
+        if (in_array($message["text"], $this->requestsAboutCompanyItems->getNamesOfCategories($this->getCompanyIdByName($cartUser["company"], $cartUser["town"])))) {
+            $categoryName = $message["text"];
             $this->menuByCompanySender->sendMenuByCompany($this->getCompanyIdByName($cartUser["company"], $cartUser["town"]), $user["chat_id"], $categoryName);
+            return true;
         }
 
     }
 
     private function textIsItem($message)
     {
-
+        Cache::put("hello", "hello");
         $message = $message->toArray();
+        Cache::put("mess", ($message->toArray())["callback_query"]);
+
+        Cache::put("callback_query", array_key_exists("callback_query", $message));
         if (!array_key_exists("callback_query", $message))
             return false;
+
         $user = $this->getUser($message["callback_query"]["from"]["id"])[0];
         $cartUser = Cache::get($user["cart_id"]);
         $item = $message["callback_query"]["data"];
         $itemsList = $this->requestsAboutCompanyItems->getItemsNameList($this->getCompanyIdByName($cartUser["company"], $cartUser["town"]));
-     //  dd($item);
+        //  dd($item);
         //dd($itemsList);
-        if (in_array($item, $itemsList) ||$this->shortNameOfItemExistsInItemsList($item, $itemsList)
+        if (in_array($item, $itemsList) || $this->shortNameOfItemExistsInItemsList($item, $itemsList)
         ) {
 
             $item = $this->getItemIdByName($item, $itemsList);
@@ -134,7 +164,7 @@ class MainListener
                 $cartUser = $this->addCountItems($item, $cartUser);
                 Cache::put($user["cart_id"], $cartUser);
             }
-
+            return true;
         }
         return true;
     }
@@ -204,23 +234,26 @@ class MainListener
 
     private function textIsAddress($message)
     {
-        $user = $this->getUser($message["message"]["chat"]["id"])[0];
+        $user = $this->getUser($message["chat"]["id"])[0];
         $cartUser = Cache::get($user["cart_id"]);
         $addresses = $this->requestsAboutCompanies->getCompanyAddressesHowArray($cartUser["company"], $cartUser["town"]);
-        $address = $message["message"]['text'];
+        $address = $message['text'];
 
         if (in_array($address, $addresses)) {
 
             $cartUser["addressCompany"] = $address;
             Cache::put($user["cart_id"], $cartUser);
+            return true;
         }
     }
-    private function shortNameOfItemExistsInItemsList(&$item,$itemList){
-        foreach ($itemList as $longItem){
-            if(
-                $this->nameItemConvertor->controlItemNameLength($longItem)==$item
-            ){
-                $item= $longItem;
+
+    private function shortNameOfItemExistsInItemsList(&$item, $itemList)
+    {
+        foreach ($itemList as $longItem) {
+            if (
+                $this->nameItemConvertor->controlItemNameLength($longItem) == $item
+            ) {
+                $item = $longItem;
                 return true;
             }
 

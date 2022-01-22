@@ -3,6 +3,7 @@
 namespace App\Services\Users\Handlers;
 
 use App\Services\Users\Repositories\UserRepository;
+use Illuminate\Support\Facades\Cache;
 
 class UserExistHandler
 {
@@ -10,7 +11,8 @@ class UserExistHandler
 
     public function handle($message)
     {
-        return $message["message"]["contact"]["user_id"];
+        Cache::put("handle", $message["user_id"]);
+        return $message["user_id"];
     }
 
 }
