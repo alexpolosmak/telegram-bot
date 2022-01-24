@@ -2,8 +2,11 @@
 
 namespace App\Http\Commands;
 
+use App\Models\User;
 use App\Services\DotsApi\CreateOrderRequest;
 use App\Services\DotsApi\RequestsAboutCities;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Telegram\Bot\Commands\Command;
 
 class CreateOrderCommand extends  Command
@@ -24,10 +27,14 @@ class CreateOrderCommand extends  Command
 
     public function handle()
     {
-        $this->createOrderRequest->createOrder($this->update["message"]["chat"]["id"]);
+        $user = User::getUser($this->update["message"]["chat"]["id"]);
+        App::setLocale($user["lang"]);
+        $message=$this->update->toArray();
+        Cache::put("id", $message["message"]["chat"]["id"]);
+        $this->createOrderRequest->createOrder($message["message"]["chat"]["id"]);
         $this->replyWithMessage([
-            'chat_id' => $this->update["message"]["chat"]["id"],
-            'text'=>"Created is successful!",
+            'chat_id' => $message["message"]["chat"]["id"],
+            'text'=>__("message.create_is_successful"),
 
         ]);
     }

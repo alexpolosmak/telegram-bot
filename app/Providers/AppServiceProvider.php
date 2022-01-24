@@ -2,9 +2,7 @@
 
 namespace App\Providers;
 
-use App\Services\DotsApi\RequestsAboutCompanyItems;
-use App\Services\Listeners\MainListener;
-use App\Services\Telegram\Handlers\CityHandler;
+
 use App\Services\Users\UserService;
 use App\Services\Users\UserServiceInterface;
 use App\Telegram\BotInstance;
@@ -26,7 +24,8 @@ class AppServiceProvider extends ServiceProvider
             return new BotInstance();
 
         });
-        app()->bind(Client::class);
+
+  //      app()->bind(Client::class);
 
 
 

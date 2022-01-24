@@ -4,6 +4,7 @@ namespace App\Services\DotsApi;
 
 
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cache;
 
 class RequestsAboutCompanies
 {
@@ -48,11 +49,13 @@ class RequestsAboutCompanies
 
     public function getCompaniesListAsArrayByCity(string $city)
     {
+
         $body = $this->getCompanyList($city);
+        Cache::put("bod",$body);
         $companyList = [];
         foreach ($body as $company) {
             $company = (array)$company;
-            $companyList[] = $company["name"]=="" ?$company["url"]:$company["name"];
+            $companyList[] = $company["name"]=="" ? $company["url"] : $company["name"];
         }
         return $companyList;
     }
@@ -181,6 +184,13 @@ class RequestsAboutCompanies
             }
 
         }
+    }
+
+    public function getScheduleListForCompanyByName(string $nameCompany,string $cityName){
+       $companyId= $this->getCompanyIdByCompanyName($nameCompany,$cityName);
+       $info=$this->getInfoAboutCompany($companyId);
+       //Cache::put("info2",$info["schedule"][0]->id);
+       return $info["schedule"];
     }
 
 //    public function getDeliveryTimeByCompanyId($companyName, $cityName){

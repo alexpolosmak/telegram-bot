@@ -6,6 +6,8 @@ use App\Models\User;
 use App\Services\Convertors\TimeConvertor;
 use App\Services\Telegram\Sender\CompanyByCitySender;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Cache;
+
 
 class CreateOrderRequest
 {
@@ -32,8 +34,8 @@ class CreateOrderRequest
         $companyId = $this->requestAboutCompanies->getCompanyIdByCompanyName($cartUser["company"], $cartUser["town"]);
         $companyAddressId = $this->requestAboutCompanies->getAddressIdByAddressName($cartUser["addressCompany"], $cartUser["company"], $cartUser["town"]);
         //  dd(($this->requestAboutCompanies->getInfoAboutCompany($companyId))["deliveryTime"]);
-        $deliveryTime =$this->getDeliveryTime($companyId);
-        $deliveryTime = $this->convertorTime->convertTimeFromTimeDeliveryToUnix($deliveryTime);
+        //$deliveryTime = $this->getDeliveryTime($companyId);
+        //$deliveryTime = $this->convertorTime->convertTimeFromTimeDeliveryToUnix($deliveryTime);
 
         $data['orderFields'] = [
             'cityId' => $this->requestAboutCities->getCityIdByCitName($cartUser["town"]),
@@ -43,10 +45,12 @@ class CreateOrderRequest
             'userPhone' => $cartUser["number_phone"],
             'deliveryType' => 2,
             'paymentType' => 1,
-            'deliveryTime' => 0,
+            'deliveryTime' => $cartUser["deliveryTime"],
             'cartItems' => $cartUser["items"]
         ];
 
+
+        Cache::put("order", json_encode($data));
         $client = new Client();
         $response = $client->post(
             'https://clients-api.dots.live/api/v2/orders',
@@ -56,7 +60,9 @@ class CreateOrderRequest
                     'Api-Token' => config("configPermission")["Api_Token"],
                     'Api-Account-Token' => config("configPermission")["Api_Account_Token"],
                     'Content-Type' => config("configPermission")["Content_Type"],
-                    'Accept' => config("configPermission")["Accept"]
+                    'Accept' => config("configPermission")["Accept"],
+                    "Api-lang"=>"ua"
+
 
                 ],
                 'query' => [
@@ -65,6 +71,7 @@ class CreateOrderRequest
                 'json' => $data,
             ]
         );
+        Cache::put("response", $response);
         //  dd($response);
         //    $body = $response->getBody();
 

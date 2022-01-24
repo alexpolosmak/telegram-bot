@@ -19,13 +19,13 @@ class User extends Authenticatable
 
     public function getCartUser($chatId)
     {
-        $user = (User::getUser($chatId))[0];
+        $user = (User::getUser($chatId));
 
         return Cache::get($user["cart_id"]);
     }
 
     public function getUser($chatId): array
     {
-        return (User::query()->where("chat_id", "=", $chatId)->get())->toArray();
+        return (User::query()->where("chat_id", "=", $chatId)->get())->toArray()[0];
     }
 }

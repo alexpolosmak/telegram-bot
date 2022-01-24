@@ -23,6 +23,7 @@ class UserRepository
         Cache::put($cartID, [
             "number_phone" => $data["phone_number"],
             "name" => $data["first_name"],
+            "deliveryTime"=>"",
             "town" => "",
             "company" => "",
             "items" => []

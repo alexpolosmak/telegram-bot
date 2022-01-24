@@ -2,14 +2,20 @@
 
 namespace App\Http\Commands;
 
+use App\Languages\English;
+
+use App\Models\User;
 use App\Services\DotsApi\RequestsAboutCities;
 use App\Services\DotsApi\RequestsAboutCompanyItems;
 use App\Services\Telegram\Handlers\CityHandler;
 use App\Telegram\BotInstance;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Telegram\Bot\Actions;
 use Telegram\Bot\Commands\Command;
 use Telegram\Bot\Keyboard\Keyboard;
+use function PHPUnit\Framework\logicalAnd;
 
 class CityCommand extends Command
 {
@@ -18,7 +24,8 @@ class CityCommand extends Command
     public function __construct()
     {
 
-        $this->apiCompanyServices = new RequestsAboutCities() ;
+        $this->apiCompanyServices = new RequestsAboutCities();
+
     }
 
     /**
@@ -36,15 +43,10 @@ class CityCommand extends Command
      */
     public function handle()
     {
-     //   dd("hello");
 
-
+        $user = User::getUser($this->update["message"]["chat"]["id"]);
+        App::setLocale($user["lang"]);
         $citiesList = $this->apiCompanyServices->getCitiesListAsArrayOfArrays();
-      //  $citiesList[]=(array)"/city";
-       // dd($citiesList);
-       // dd($citiesList);
-//dd($this->cityhandler->getCity());
-//dd(is_array($citiesList));
 
 
         $this->replyWithChatAction(['action' => Actions::TYPING]);
@@ -59,19 +61,13 @@ class CityCommand extends Command
 
         ]);
 
+
+        //
         $response = $this->replyWithMessage([
-            'chat_id' => $this->update["message"]["chat"]["id"],
-            'text'=>"Enter your own city:",
+            'chat_id' => $user["chat_id"],
+            'text' => __("message.enter_city"),
             'reply_markup' => $reply_markup
         ]);
-//        $commands = $this->getTelegram()->getCommands();
-//
-//        $response = '';
-//        foreach ($commands as $name => $command) {
-//            $response .= sprintf('/%s - %s' . PHP_EOL, $name, $command->getDescription());
-//        }
-//
-//        $this->replyWithMessage(['text' => $response]);
-        //  $this->triggerCommand("menu");
+
     }
 }

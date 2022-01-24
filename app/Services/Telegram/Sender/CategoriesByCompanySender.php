@@ -4,6 +4,7 @@ namespace App\Services\Telegram\Sender;
 
 use App\Services\DotsApi\RequestsAboutCompanyItems;
 use App\Telegram\BotInstance;
+use Illuminate\Support\Facades\App;
 use Telegram\Bot\FileUpload\InputFile;
 use Telegram\Bot\Keyboard\Keyboard;
 
@@ -21,13 +22,14 @@ class CategoriesByCompanySender
         $this->bot = $bot->getBot();
     }
 
-    public function sendCategoriesByCompany($companyId, $chatId)
+    public function sendCategoriesByCompany($companyId, $chatId,$lang)
     {
+        App::setLocale($lang);
         $categories = $this->requestsAboutCompanyItems->getNamesOfCategoriesAsArrayOfArrays($companyId);
 
         $this->bot->sendMessage([
             'chat_id' => $chatId,
-            'text' => 'Choose category: ',
+            'text' => __("message.choose_category"),
             "reply_markup" => $this->getButtonsArray($categories)
         ]);
 

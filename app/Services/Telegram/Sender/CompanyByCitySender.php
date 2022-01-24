@@ -4,6 +4,7 @@ namespace App\Services\Telegram\Sender;
 
 use App\Services\DotsApi\RequestsAboutCompanies;
 use App\Telegram\BotInstance;
+use Illuminate\Support\Facades\App;
 use Telegram\Bot\Keyboard\Keyboard;
 
 class CompanyByCitySender
@@ -18,8 +19,9 @@ class CompanyByCitySender
         $this->requestsAboutCompanies = $requestsAboutCompanies;
         $this->bot = $bot->getBot();
     }
-    public function sendCompaniesListByCity($cityName, $chatId)
+    public function sendCompaniesListByCity($cityName, $chatId,$lang)
     {
+        App::setLocale($lang);
         $companiesList=$this->requestsAboutCompanies->getCompanyListByCityAsArrayOfArrays($cityName);
         $reply_markup = Keyboard::button([
             'keyboard' => $companiesList,
@@ -31,7 +33,7 @@ class CompanyByCitySender
         ]);
         $this->bot->sendMessage([
             "chat_id" => $chatId,
-            "text" => "Chose dishes and touch on appropriate buttons",
+            "text" => __("message.choose_company"),
             'reply_markup' => $reply_markup,
         ]);
 //return true;

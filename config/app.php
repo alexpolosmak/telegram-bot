@@ -1,6 +1,6 @@
 <?php
 
-use App\Telegram\Facades\BotInstance;
+//use App\Telegram\Facades\BotInstance;
 
 return [
 

@@ -4,15 +4,24 @@ namespace App\Services\Listeners;
 
 use App\Models\User;
 use App\Services\Convertors\NameItemConvertor;
+use App\Services\Convertors\TimeConvertor;
 use App\Services\DotsApi\RequestsAboutCities;
 use App\Services\DotsApi\RequestsAboutCompanies;
 use App\Services\DotsApi\RequestsAboutCompanyItems;
+use App\Services\Telegram\Sender\AddressWasSavedSender;
 use App\Services\Telegram\Sender\CategoriesByCompanySender;
+use App\Services\Telegram\Sender\CitiesListSender;
 use App\Services\Telegram\Sender\CompanyByCitySender;
+use App\Services\Telegram\Sender\CreateOrderSender;
 use App\Services\Telegram\Sender\MenuByCompanySender;
+use App\Services\Telegram\Sender\NewItemMessageSender;
+use App\Services\Telegram\Sender\RequestContactSender;
+use App\Services\Telegram\Sender\RequestDeliveryTimeSender;
 use App\Services\Users\UserServiceInterface;
 use App\Telegram\BotInstance;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Cache;
+use Telegram\Bot\Objects\Update;
 
 
 class MainListener
@@ -27,6 +36,13 @@ class MainListener
     private $requestsAboutCompanyItems;
     private $categoriesByCompanySender;
     private $nameItemConvertor;
+    private $citiesListSender;
+    private $newItemMessageSender;
+    private $addressWasSavedSender;
+    private $requestDeliveryTimeSender;
+    private $timeConvertor;
+    private $createOrderSender;
+    private $requestContactSender;
 
     public function __construct(
         UserServiceInterface      $userService,
@@ -36,7 +52,16 @@ class MainListener
         CompanyByCitySender       $companyByCitySender,
         RequestsAboutCompanyItems $requestsAboutCompanyItems,
         CategoriesByCompanySender $categoriesByCompanySender,
-        NameItemConvertor         $nameItemConvertor
+        NameItemConvertor         $nameItemConvertor,
+        CitiesListSender          $citiesListSender,
+        NewItemMessageSender      $newItemMessageSender,
+        AddressWasSavedSender     $addressWasSavedSender,
+        RequestDeliveryTimeSender $requestDeliveryTimeSender,
+        TimeConvertor             $timeConvertor,
+        CreateOrderSender         $createOrderSender,
+        RequestContactSender      $requestContactSender
+
+
     )
     {
         $this->companyByCitySender = $companyByCitySender;
@@ -51,37 +76,72 @@ class MainListener
         $this->requestsAboutCompanyItems = $requestsAboutCompanyItems;
         $this->categoriesByCompanySender = $categoriesByCompanySender;
         $this->nameItemConvertor = $nameItemConvertor;
+        $this->citiesListSender = $citiesListSender;
+        $this->newItemMessageSender = $newItemMessageSender;
+        $this->addressWasSavedSender = $addressWasSavedSender;
+        $this->requestDeliveryTimeSender = $requestDeliveryTimeSender;
+        $this->timeConvertor = $timeConvertor;
+        $this->createOrderSender = $createOrderSender;
+        $this->requestContactSender = $requestContactSender;
+
+
     }
 
     public function listen()
     {
         Cache::put("mess1", $this->messages);
-        Cache::put("mess123", "123");
-        if ($this->textIsItem($this->messages)) {
 
+        if ($this->isCommand()) {
             return true;
         }
-        Cache::put("arround", $this->messages);
+        //  Cache::put("item", $this->messages->toArray());
+
+        Cache::put("ITEM", "true");
+        if ($this->textIsItem($this->messages)) {
+            return true;
+        }
+
+        //    Cache::put("arround", $this->messages);
         $message = $this->messages["message"];
         //   $message = (array)$message;
 
-
+        Cache::put("connn", "true1");
         if (array_key_exists("contact", $message)) {
+            Cache::put("if1", "true1");
+            if ($this->userService->store($message["contact"])) {
+                Cache::put("if2", "true");
+                Cache::put("al  ", $message["chat"]["id"]);
+                $this->citiesListSender->sendCitiesList($message["chat"]["id"]);
 
-            return $this->userService->store($message["contact"]);
+                return true;
+            }
         }
+        if ($this->textIsLanguage($message)) {
+            return true;
+        }
+        Cache::put("City", "123");
         if ($this->textIsCity($message)) {
             return true;
         }
+        Cache::put("company", "321");
         if ($this->textIsCompany($message)) {
             return true;
         }
+        Cache::put("category", "2222");
         if ($this->textIsCategory($message)) {
             return true;
         }
+        Cache::put("address", "true");
         if ($this->textIsAddress($message)) {
             return true;
         }
+        Cache::put("time", "123");
+        if ($this->textIsDeliveryTime($message)) {
+            Cache::put("inText", "true");
+            return true;
+        }
+        Cache::put("aka", "true");
+
 
 //        $this->textIsAddress($message);
 
@@ -90,19 +150,19 @@ class MainListener
 
     private function textIsCity($message)
     { //Cache::put("city",$message);
-        Cache::put("cities", $this->requestsAboutCities->getCitiesListAsArray());
-        Cache::put("data2", $message["text"]);
+//        Cache::put("cities", $this->requestsAboutCities->getCitiesListAsArray());
+//        Cache::put("data2", $message["text"]);
         if (in_array($message["text"], $this->requestsAboutCities->getCitiesListAsArray())) {
-            Cache::put("city12", $message["text"]);
-            $user = User::query()->where("chat_id", "=", $message["chat"]["id"])->get();
-            $cartId = ($user->toArray())[0]["cart_id"];
-            $cart = Cache::get($cartId);
+          //  Cache::put("city12", $message["text"]);
+            $user = User::getUser($message["chat"]["id"]);
+          //  $cartId = ($user->toArray())[0]["cart_id"];
+            $cart = Cache::get($user["cart_id"]);
             $cart["town"] = $message["text"];
-            Cache::put($cartId, $cart);
-            Cache::put("id", $message["chat"]["id"]);
-            Cache::put("town", $message["text"]);
+            Cache::put($user["cart_id"], $cart);
+//            Cache::put("id", $message["chat"]["id"]);
+//            Cache::put("town", $message["text"]);
 
-            $this->companyByCitySender->sendCompaniesListByCity($message["text"], $message["chat"]["id"]);
+            $this->companyByCitySender->sendCompaniesListByCity($message["text"], $message["chat"]["id"],$user["lang"]);
             return true;
         }
         return false;
@@ -110,20 +170,28 @@ class MainListener
 
     private function textIsCompany($message)
     {
-        $user = $this->getUser($message["chat"]["id"])[0];
+        $user = User::getUser($message["chat"]["id"]);
+        Cache::put("1111",$user);
         $cartUser = Cache::get($user["cart_id"]);
+        Cache::put("companies", $this->requestsAboutCompanies->getCompaniesListAsArrayByCity($cartUser["town"]));
+        Cache::put("rrrr", $message["text"]);
+      //  Cache::put("trueCom12",true);
         if (in_array($message["text"], $this->requestsAboutCompanies->getCompaniesListAsArrayByCity($cartUser["town"]))) {
+            Cache::put("trueCom1",false);
             $cartUser["company"] = $message["text"];
             Cache::put($user["cart_id"], $cartUser);
-            $this->categoriesByCompanySender->sendCategoriesByCompany($this->getCompanyIdByName($message["text"], $cartUser["town"]), $user["chat_id"]);
+            $this->categoriesByCompanySender->sendCategoriesByCompany($this->getCompanyIdByName($message["text"], $cartUser["town"]), $user["chat_id"], $user["lang"]);
             return true;
         }
+        return false;
     }
 
     public function textIsCategory($message)
     {
-        $user = $this->getUser($message["chat"]["id"])[0];
+        $user = User::getUser($message["chat"]["id"]);
         $cartUser = Cache::get($user["cart_id"]);
+        Cache::put("truecom",$message["text"]);
+        Cache::put("trueComl", $this->requestsAboutCompanyItems->getNamesOfCategories($this->getCompanyIdByName($cartUser["company"], $cartUser["town"])));
         //  dd($this->requestsAboutCompanies->getCityId($cartUser["town"]));
         // dd($this->getCompanyIdByName($cartUser["company"], $cartUser["town"]));
         //  dd( $this->requestsAboutCompanyItems->getNamesOfCategories($this->requestsAboutCompanies->getCityId($cartUser["town"])));
@@ -137,36 +205,29 @@ class MainListener
 
     private function textIsItem($message)
     {
-        Cache::put("hello", "hello");
+        Cache::put("call1", $message);
         $message = $message->toArray();
-        Cache::put("mess", ($message->toArray())["callback_query"]);
-
         Cache::put("callback_query", array_key_exists("callback_query", $message));
         if (!array_key_exists("callback_query", $message))
             return false;
 
-        $user = $this->getUser($message["callback_query"]["from"]["id"])[0];
+        $user = User::getUser($message["callback_query"]["from"]["id"]);
         $cartUser = Cache::get($user["cart_id"]);
         $item = $message["callback_query"]["data"];
-        $itemsList = $this->requestsAboutCompanyItems->getItemsNameList($this->getCompanyIdByName($cartUser["company"], $cartUser["town"]));
-        //  dd($item);
-        //dd($itemsList);
-        if (in_array($item, $itemsList) || $this->shortNameOfItemExistsInItemsList($item, $itemsList)
-        ) {
-
-            $item = $this->getItemIdByName($item, $itemsList);
 
             if (!$this->orderItemAlreadyExist($item, $cartUser)) {
                 $cartUser["items"][] = ["id" => $item, "count" => 1];
-
                 Cache::put($user["cart_id"], $cartUser);
+                $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"]);
+
             } else {
                 $cartUser = $this->addCountItems($item, $cartUser);
                 Cache::put($user["cart_id"], $cartUser);
+                $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"]);
             }
             return true;
-        }
-        return true;
+
+
     }
 
 
@@ -243,21 +304,88 @@ class MainListener
 
             $cartUser["addressCompany"] = $address;
             Cache::put($user["cart_id"], $cartUser);
+            $this->addressWasSavedSender->sendMessageAboutAddressWasSaved($user["chat_id"], $user["lang"]);
+            $this->requestDeliveryTimeSender->sendRequestAboutDeliveryTime($user, $cartUser);
             return true;
+        } else {
+            // $this->addressWasSavedSender->sendMessageAboutAddressWasNotSaved($user["chat_id"]);
+            return false;
         }
+
+    }
+
+    private function textIsLanguage($message)
+    {
+
+        if ($message["text"] == "english") {
+            User::query()->where("chat_id", "=", $message["chat"]["id"])->update([
+                "lang" => "en"
+            ]);
+            return $this->requestContactSender->sendRequestContact($message["chat"]["id"]);
+        }
+        if ($message["text"] == "ukrainian") {
+            User::query()->where("chat_id", "=", $message["chat"]["id"])->update([
+                "lang" => "ua"
+            ]);
+            return $this->requestContactSender->sendRequestContact($message["chat"]["id"]);
+        }
+        if ($message["text"] == "russian") {
+            User::query()->where("chat_id", "=", $message["chat"]["id"])->update([
+                "lang" => "ru"
+            ]);
+            return $this->requestContactSender->sendRequestContact($message["chat"]["id"]);
+        }
+
+        return false;
+    }
+
+    private function textIsDeliveryTime($message)
+    {
+        //   return true;
+        Cache::put("y", $message);
+        $timeFormat = "/(min.)$|(хв.)$|(мин.)$/";
+        Cache::put("preg1", "true");
+        Cache::put("pregRes", preg_match($timeFormat, $message["text"]));
+        if (!preg_match($timeFormat, $message["text"])) {
+            Cache::put("preg", "true2");
+            return false;
+        }
+        $user = $this->getUser($message["chat"]["id"])[0];
+        $cartUser = Cache::get($user["cart_id"]);
+        $cartUser["deliveryTime"] = $this->timeConvertor->convertTimeFromTimeDeliveryToUnix($message["text"]);
+        Cache::put($user["cart_id"], $cartUser);
+        $this->createOrderSender->sendInviteForCreateOrder($message["chat"]["id"]);
+        return true;
+
     }
 
     private function shortNameOfItemExistsInItemsList(&$item, $itemList)
     {
-        foreach ($itemList as $longItem) {
+        foreach ($itemList as $key => $longItem) {
             if (
                 $this->nameItemConvertor->controlItemNameLength($longItem) == $item
+
             ) {
+                Cache::put("lm", $longItem);
+                Cache::put("longItem1", $this->nameItemConvertor->controlItemNameLength($longItem));
                 $item = $longItem;
                 return true;
             }
 
         }
         return false;
+    }
+
+    private function isCommand()
+    {
+        if (!array_key_exists("message", $this->messages->toArray()) || !array_key_exists("entities", $this->messages->toArray()["message"]))
+            return false;
+        $type = $this->messages->toArray()["message"]["entities"][0]["type"];
+        if ($type == "bot_command") {
+
+            return true;
+        }
+        return false;
+
     }
 }

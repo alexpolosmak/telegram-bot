@@ -62,6 +62,6 @@ class UserService implements UserServiceInterface
         $user = User::getUser($chat_id);
 //dd($user);
 
-        return $this->userRepository->CleanCartUser($user[0]["cart_id"]);
+        return $this->userRepository->CleanCartUser($user["cart_id"]);
     }
 }

@@ -5,7 +5,7 @@ namespace App\Http\Commands;
 use App\Services\Telegram\Sender\GetCompanyAddressForOrder;
 use Telegram\Bot\Commands\Command;
 
-class GetAddressCompanyCommand extends Command
+class SetDeliveryTimeCommand extends Command
 {
     private $getCompanyAddressForOrder;
     public function __construct()

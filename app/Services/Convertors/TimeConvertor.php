@@ -13,7 +13,7 @@ class TimeConvertor
 
         $items = explode(" ", $timeDelivery);
         if ($items[count($items) - 1] == "хв." || 'хв' || "min" || "min.") {
-            return time() + (($items[0]+1) * 60);
+            return time() + (($items[0]+2  ) * 60);
         }
 
     }
