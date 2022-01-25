@@ -89,6 +89,7 @@ class MainListener
 
     public function listen($updateFromTelegram)
     {
+        Cache::put("user11",true);
         if ($this->isCommand($updateFromTelegram)) {
             return true;
         }
@@ -185,12 +186,13 @@ class MainListener
         if (!$this->orderItemAlreadyExist($item, $cartUser)) {
             $cartUser["items"][] = ["id" => $item, "count" => 1];
             Cache::put($user["cart_id"], $cartUser);
-            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"]);
+
+            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"],$cartUser["town"],$cartUser["company"]);
 
         } else {
             $cartUser = $this->addCountItems($item, $cartUser);
             Cache::put($user["cart_id"], $cartUser);
-            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"]);
+            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"],$cartUser["town"],$cartUser["company"]);
         }
         return true;
 

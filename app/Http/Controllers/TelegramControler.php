@@ -19,12 +19,13 @@ use Telegram\Bot\Exceptions\TelegramSDKException;
 class TelegramControler extends Controller
 {
 
-private $bot;
+    private $bot;
+    private $mainListener;
 
-    public function __construct(BotInstance $bot )
+    public function __construct(BotInstance $bot, MainListener $mainListener)
     {
         $this->bot = $bot->getBot();
-
+        $this->mainListener = $mainListener;
     }
 
     /**
@@ -43,8 +44,9 @@ private $bot;
         $this->bot->addCommand(GetAddressCompanyCommand::class);
 
         $this->bot->commandsHandler(true);
+       $this->mainListener->listen($this->bot->getWebhookUpdate());
+          // ProcessingTextMessageJob::dispatch($this->bot->getWebhookUpdate())->onQueue("default");
 
-       ProcessingTextMessageJob::dispatch($this->bot->getWebhookUpdate())->onQueue("default");
         return response()->json(null, 200);
 
 

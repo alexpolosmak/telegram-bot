@@ -21,7 +21,7 @@ class RequestsAboutCompanies
     }
 
 
-    private function getCompanyList(string $city)
+    public function getCompanyList(string $city)
     {
         $city = $this->getCityId($city);
         //  dd($city);
@@ -162,6 +162,7 @@ class RequestsAboutCompanies
         );
         $body = $response->getBody();
         $body = (array)json_decode($body);
+        Cache::put("bbbb",$body);
         return $body;
 
     }

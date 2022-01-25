@@ -34,9 +34,12 @@ class RequestDeliveryTimeSender
         App::setLocale($user["lang"]);
 
         $schedule = $this->requestsAboutCompanies->getScheduleListForCompanyByName($cartUser["company"], $cartUser["town"]);
+        Cache::put("chr",$schedule );
         foreach ($schedule as $day) {
+
             if ($day->endTime > time() && $day->startTime < time() && $day->isActive == true) {
-                Cache::put("forif", "true");
+
+                Cache::put("rhc",$schedule );
                 $text = __("message.deliveryTime") . $day->start . __("message.to") . $day->end;
                 return $this->bot->sendMessage([
                     'chat_id' => $user["chat_id"],

@@ -12,14 +12,16 @@ class RequestsAboutCompanyItems
     private $client;
 //    private $lang = ["ua" => "ua", "ru" => "ru", "en" => "en"];
   //  private  $currentLang = "en";
-
+private $requestsAboutCities;
     public function __construct(
-        RequestsAboutCompanies $requestsAboutCompanies
+        RequestsAboutCompanies $requestsAboutCompanies,
+        RequestsAboutCities $requestsAboutCities
 
     )
     {
         $this->requestsAboutCompanies = $requestsAboutCompanies;
         $this->client = new Client();
+        $this->requestsAboutCities=$requestsAboutCities;
     }
 
 
@@ -51,14 +53,13 @@ class RequestsAboutCompanyItems
 
     public function getItemsListAsArrayByCompanyId(string $companyId)
     {
-      //  $this->setCurrentLanguage($companyId);
+
 
         return $this->getItemsList($companyId);
     }
 
     public function getItemsNameList(string $companyId)
     {
-     //   $this->setCurrentLanguage($companyId);
         $categoriesListWithItems = $this->getItemsList($companyId);
         $itemList = [];
         foreach ($categoriesListWithItems as $category) {
@@ -76,8 +77,6 @@ class RequestsAboutCompanyItems
     public function getNamesOfCategoriesAsArrayOfArrays(string $companyId)
     {
         Cache::put("lan12","fs");
-      //  $this->setCurrentLanguage($companyId);
-       // Cache::put("lan1",$this->currentLang);
         $categoriesListWithItems = $this->getItemsList($companyId);
         $categories = [];
         foreach ($categoriesListWithItems as $category) {
@@ -90,8 +89,6 @@ class RequestsAboutCompanyItems
 
     public function getNamesOfCategories(string $companyId)
     {
-      //  $this->setCurrentLanguage($companyId);
-        //Cache::put("lan12",$this->currentLang);
         $categoriesListWithItems = $this->getItemsList($companyId);
         $categories = [];
         foreach ($categoriesListWithItems as $category) {
@@ -102,37 +99,40 @@ class RequestsAboutCompanyItems
         return $categories;
     }
 
-//    private function setCurrentLanguage(string $companyId) : void
-//    {
-//        foreach ($this->lang as $language) {
-//            if (!$this->mustSwitchRequestLanguage($companyId)){
-//                $this->currentLang=$language;
-//                return;
-//            }
-//
-//            }
-//       // $this->currentLang="en";
-//
-//    }
+    public function getNameItemByIdItem($cityName,$companyName, $itemId)
+    {
 
-//    private function mustSwitchRequestLanguage(string $companyId) :bool
-//    {
-//        $data= $this->getItemsList( $companyId);
-//        foreach ($data as $category){
-//
-//            if($category->name=="" || $category->url=="" ) {
-//
-//
-//                return true;
-//            }
-//            foreach ($category->items as $item){
-//                if($item->name=="")
-//                    return true;
-//           }
-//
-//        }
-//        Cache::put("ifif1","true".$this->currentLang);
-//        return false;
-//    }
+        Cache::put("cityName1",$cityName);
+        Cache::put("companyName1",$companyName);
+        Cache::put("itemId1",$itemId);
+        $cityId = $this->requestsAboutCompanies->getCityId($cityName);
+        Cache::put("cityId1",$cityId);
+        $companyList=  $this->requestsAboutCompanies->getCompanyListAsArrayWithId($cityName);
+        Cache::put("companyList1",$companyList);
+        $companyId="";
+        foreach ($companyList as $key=>$company){
+            if($company== $companyName  ){
+                $companyId=$key;
+            }
+        }
+        Cache::put("companyId1",$companyId);
+        $itemList=$this->getItemsListAsArrayByCompanyId($companyId);
+        foreach ($itemList as $category){
+            Cache::put("category1",$category);
+            foreach ($category->items as $item){
+                Cache::put("itemmm1",$item);
+                if($item->id == $itemId){
+                    if($item->name == ""){
+                        return $item->url;
+                    }
+                    return $item->name;
+                }
+
+            }
+
+        }
+return false;
+
+}
 
 }

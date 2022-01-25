@@ -42,7 +42,7 @@ class GetCompanyAddressForOrder
         ]);
         return $this->bot->sendMessage([
             "chat_id" => $chatId,
-            "text" => __("message.choose_dishes"),
+            "text" => __("message.choose_company_address"),
             'reply_markup' => $reply_markup,
         ]);
     }

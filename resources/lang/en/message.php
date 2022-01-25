@@ -34,7 +34,8 @@ return [
     "to" => " to ",
     "company_not_working_today" => "\nSorry, today company is not working.\nPlease be aware of this if you would like to pre-order.",
     "choose_company" => "Choose company",
-    "failed_request" => "I dont understand what do you want.Check if the input is correct"
+    "failed_request" => "I dont understand what do you want.Check if the input is correct",
+    "choose_company_address"=>"Choose company address where you want get your order"
 
 
 ];
