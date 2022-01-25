@@ -35,17 +35,17 @@ class TelegramControler extends Controller
      */
     public function update()
     {
-        $this->bot->addCommand(StartCommand::class);
-        $this->bot->addCommand(SetLanguage::class);
-        $this->bot->addCommand(GetContactCommand::class);
-        $this->bot->addCommand(CityCommand::class);
-
-        $this->bot->addCommand(CreateOrderCommand::class);
-        $this->bot->addCommand(GetAddressCompanyCommand::class);
-Cache::put("slavik",$this->bot->getWebhookUpdate());
-        $this->bot->commandsHandler(true);
-
-       $this->mainListener->listen($this->bot->getWebhookUpdate());
+//        $this->bot->addCommand(StartCommand::class);
+//        $this->bot->addCommand(SetLanguage::class);
+//        $this->bot->addCommand(GetContactCommand::class);
+//        $this->bot->addCommand(CityCommand::class);
+//
+//        $this->bot->addCommand(CreateOrderCommand::class);
+//        $this->bot->addCommand(GetAddressCompanyCommand::class);
+//Cache::put("slavik",$this->bot->getWebhookUpdate());
+//        $this->bot->commandsHandler(true);
+//
+//       $this->mainListener->listen($this->bot->getWebhookUpdate());
           // ProcessingTextMessageJob::dispatch($this->bot->getWebhookUpdate())->onQueue("default");
 
         return response()->json(null, 200);
