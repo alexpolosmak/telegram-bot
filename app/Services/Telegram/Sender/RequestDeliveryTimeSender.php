@@ -26,17 +26,15 @@ class RequestDeliveryTimeSender
 
     public function sendRequestAboutDeliveryTime($user, $cartUser)
     {
+        $this->bot->sendChatAction([
+            'chat_id' => $user["chat_id"],
+            "action" => "typing"
+        ]);
+
         App::setLocale($user["lang"]);
 
         $schedule = $this->requestsAboutCompanies->getScheduleListForCompanyByName($cartUser["company"], $cartUser["town"]);
-        Cache::put("shed", $schedule);
-        Cache::put("send", "true");
         foreach ($schedule as $day) {
-            Cache::put("dayEndTime", "$day->endTime");
-            Cache::put("time", time());
-            Cache::put("userC", $user["chat_id"]);
-
-
             if ($day->endTime > time() && $day->startTime < time() && $day->isActive == true) {
                 Cache::put("forif", "true");
                 $text = __("message.deliveryTime") . $day->start . __("message.to") . $day->end;
@@ -50,14 +48,12 @@ class RequestDeliveryTimeSender
             }
 
         }
-        Cache::put("notfor", "true");
         return $this->bot->sendMessage([
             'chat_id' => $user["chat_id"],
-            'text' => __("company_not_working_today"),
+            'text' => __("message.company_not_working_today"),
             'parse_mode' => "HTML"
 
         ]);
-        //return true;
 
 
     }

@@ -19,6 +19,10 @@ class AddressWasSavedSender
 
     public function sendMessageAboutAddressWasSaved($chatId,$lang){
         App::setLocale($lang);
+        $this->bot->sendChatAction([
+            'chat_id' => $chatId,
+            "action"=>"typing"
+        ]);
         $text=__("message.address_was_saved");
         $this->bot->sendMessage([
             'chat_id' => $chatId,

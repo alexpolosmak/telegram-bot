@@ -30,7 +30,6 @@ class CreateOrderCommand extends  Command
         $user = User::getUser($this->update["message"]["chat"]["id"]);
         App::setLocale($user["lang"]);
         $message=$this->update->toArray();
-        Cache::put("id", $message["message"]["chat"]["id"]);
         $this->createOrderRequest->createOrder($message["message"]["chat"]["id"]);
         $this->replyWithMessage([
             'chat_id' => $message["message"]["chat"]["id"],

@@ -21,6 +21,11 @@ class CompanyByCitySender
     }
     public function sendCompaniesListByCity($cityName, $chatId,$lang)
     {
+        $this->bot->sendChatAction([
+            'chat_id' => $chatId,
+            "action"=>"typing"
+        ]);
+
         App::setLocale($lang);
         $companiesList=$this->requestsAboutCompanies->getCompanyListByCityAsArrayOfArrays($cityName);
         $reply_markup = Keyboard::button([
@@ -36,6 +41,6 @@ class CompanyByCitySender
             "text" => __("message.choose_company"),
             'reply_markup' => $reply_markup,
         ]);
-//return true;
+
     }
 }

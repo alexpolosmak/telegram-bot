@@ -5,16 +5,19 @@ return [
     "create_is_successful" => "Заказ отправлен успешно!",
     "contact" => "Поделитесь своим контактом",
     "language" => "Выберите предпочитаемый язык интерфейса:",
-    "start_message" => "How you can make order use this bot?
-            1.Share your contact.
-            2.Choose city where you want get order.
-            3.Choose company where you want make order.
-            4.Press button with dish name for adding dish in your order.
-            5.Choose address company where you want get order
-            If you want choose several identical dishes just press dish button  several.
-              Remember!!!
-              You can only choose dishes from one company.
-              If you make mistake in the making your order just repeat this guide again.",
+    "start_message" => "Как заказать еду используя нашего бота?
+    Бот достаточно умный, так что просто слудуйте за его подсказками:)
+    Для начала выберите предпочитаемый язык интерфейса
+            1.Поделитесь своим контактом.
+            2.Выберите город в котором хотите сделать заказ.
+            3.Выберите компанию в которой хотите сделать заказ.
+            4.Выберте категорию.
+            5.Нажимайте на кнопки под блюдами. Тем самым вы сможете добавить их в свой заказ.
+            5.Выберите адрес компании где вы будете забирать заказ.
+            Если вы хотите выбрать несколько штук одного блюда просто тыкните по кнопке с этим блюдом несколько раз.
+              Помни!!!
+              Вы можете выбрать блюда только с одной компании.
+              Если вы сделать ошибку то введите команду /start и начните всё заново.",
 
     "start_message_greeting" => 'Привет! Наши активные команды:',
     "address_was_saved" => "Адрес был сохранён\n",
@@ -31,6 +34,7 @@ return [
     "deliveryTime"=>"Введите количество минут от текущего времени в формате {count} мин. через которое вы хотите получить свой заказ.
         Сегодня заведение работает с  ",
     "to"=>" до ",
-    "company_not_working_today"=>"\nУпс, компания не работает сегодня.\nУчтите это если хотите сделать предзаказ.",
+    "company_not_working_today"=>"Введите количество минут от текущего времени в формате {count} мин. через которое вы хотите получить свой заказ.\nУпс, компания не работает сегодня.\nУчтите это если хотите сделать предзаказ.",
+    "failed_request"=>"Не понимаю что вы хотите. Проверьте правильность ввода."
 
 ];

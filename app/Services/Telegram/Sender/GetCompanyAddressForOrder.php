@@ -22,12 +22,16 @@ class GetCompanyAddressForOrder
 
     public function sendAddresses($chatId)
     {
-        $user=User::getUser($chatId);
+        $this->bot->sendChatAction([
+            'chat_id' => $chatId,
+            "action" => "typing"
+        ]);
+
+        $user = User::getUser($chatId);
         App::setLocale($user["lang"]);
-      //  dd("hello");
         $cartUser = User::getCartUser($chatId);
         $address = $this->requestAboutCompanies->getCompanyAddresses($cartUser["company"], $cartUser["town"]);
-//dd($address);
+
         $reply_markup = Keyboard::button([
             'keyboard' => $address,
             'resize_keyboard' => true,
@@ -36,7 +40,7 @@ class GetCompanyAddressForOrder
             "remove_keyboard" => false,
 
         ]);
-     return   $this->bot->sendMessage([
+        return $this->bot->sendMessage([
             "chat_id" => $chatId,
             "text" => __("message.choose_dishes"),
             'reply_markup' => $reply_markup,

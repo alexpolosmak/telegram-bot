@@ -16,15 +16,10 @@ class SetDeliveryTimeCommand extends Command
     protected $name = "company_address";
 
 
-    protected $description = "Choose address company where you will be take your order";
+    protected $description = "Sets delivery time";
     public function handle()
     {
         $this->getCompanyAddressForOrder->sendAddresses($this->update["message"]["chat"]["id"]);
-//        $this->replyWithMessage([
-//            'chat_id' => $this->update["message"]["chat"]["id"],
-//            'text'=>"Address was saved",
-//
-//        ]);
 
     }
 }

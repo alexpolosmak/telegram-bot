@@ -8,7 +8,9 @@ use App\Http\Commands\CityCommand;
 use App\Http\Commands\GetContactCommand;
 use App\Http\Commands\SetLanguage;
 use App\Http\Commands\StartCommand;
+use App\Jobs\ProcessingTextMessageJob;
 use App\Services\Listeners\MainListener;
+use App\Telegram\BotInstance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Telegram\Bot\Api;
@@ -16,11 +18,13 @@ use Telegram\Bot\Exceptions\TelegramSDKException;
 
 class TelegramControler extends Controller
 {
-    private $mainListener;
 
-    public function __construct(MainListener $mainListener)
+private $bot;
+
+    public function __construct(BotInstance $bot )
     {
-        $this->mainListener = $mainListener;
+        $this->bot = $bot->getBot();
+
     }
 
     /**
@@ -28,31 +32,22 @@ class TelegramControler extends Controller
      *
      *
      */
-    public function update(Request $request)
+    public function update()
     {
+        $this->bot->addCommand(StartCommand::class);
+        $this->bot->addCommand(SetLanguage::class);
+        $this->bot->addCommand(GetContactCommand::class);
+        $this->bot->addCommand(CityCommand::class);
 
-        $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
+        $this->bot->addCommand(CreateOrderCommand::class);
+        $this->bot->addCommand(GetAddressCompanyCommand::class);
 
-        $telegram->addCommand(StartCommand::class);
-        $telegram->addCommand(SetLanguage::class);
-        $telegram->addCommand(GetContactCommand::class);
-        $telegram->addCommand(CityCommand::class);
+        $this->bot->commandsHandler(true);
 
-    $telegram->addCommand(CreateOrderCommand::class);
-        $telegram->addCommand(GetAddressCompanyCommand::class);
-
-        $telegram->commandsHandler(true);
-        Cache::put("listen1", "I will go to listen1");
-      $this->mainListener->listen();
+       ProcessingTextMessageJob::dispatch($this->bot->getWebhookUpdate())->onQueue("default");
         return response()->json(null, 200);
 
 
     }
 
-//    public function getUpdate()
-//    {
-//        $telegram = new Api("5052566047:AAHiqDUingQ8UmjqlRgAbyAsg-V4Trzxqow");
-//        $telegram->getUpdates();
-//
-//    }
 }

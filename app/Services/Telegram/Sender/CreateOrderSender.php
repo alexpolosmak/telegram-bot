@@ -20,8 +20,14 @@ class CreateOrderSender
 
     public function sendInviteForCreateOrder($chatId)
     {
+        $this->bot->sendChatAction([
+            'chat_id' => $chatId,
+            "action"=>"typing"
+        ]);
+
         $user=User::getUser($chatId);
         App::setLocale($user["lang"]);
+        Cache::put("add",$chatId);
         $this->bot->sendChatAction([
             'chat_id' => $chatId,
             "action" => "typing"

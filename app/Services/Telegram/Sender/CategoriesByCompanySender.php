@@ -24,6 +24,11 @@ class CategoriesByCompanySender
 
     public function sendCategoriesByCompany($companyId, $chatId,$lang)
     {
+        $this->bot->sendChatAction([
+            'chat_id' => $chatId,
+            "action"=>"typing"
+        ]);
+
         App::setLocale($lang);
         $categories = $this->requestsAboutCompanyItems->getNamesOfCategoriesAsArrayOfArrays($companyId);
 

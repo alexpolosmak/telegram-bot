@@ -36,7 +36,7 @@ class CityCommand extends Command
     /**
      * @var string Command Description
      */
-    protected $description = "Set city in your cart";
+    protected $description = "Show companies in selected city";
 
     /**
      * @inheritdoc
@@ -62,7 +62,6 @@ class CityCommand extends Command
         ]);
 
 
-        //
         $response = $this->replyWithMessage([
             'chat_id' => $user["chat_id"],
             'text' => __("message.enter_city"),

@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('chat_id');
             $table->string('cart_id')->unique();
             $table->string('number_phone');
-            $table->string('lang')->default("english");
+            $table->string('lang')->default("en");
 
         });
     }

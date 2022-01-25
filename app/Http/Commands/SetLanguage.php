@@ -13,14 +13,6 @@ use Telegram\Bot\Objects\BotCommand;
 class SetLanguage extends Command
 {
 
-    private $apiCompanyServices;
-
-    public function __construct()
-    {
-
-        $this->apiCompanyServices = new RequestsAboutCities();
-    }
-
     /**
      * @var string Command Name
      */
@@ -29,7 +21,7 @@ class SetLanguage extends Command
     /**
      * @var string Command Description
      */
-    protected $description = "Set language";
+    protected $description = "Sets the interface language";
 
     /**
      * @inheritdoc
@@ -64,7 +56,6 @@ class SetLanguage extends Command
             'text' => __("message.language"),
             'reply_markup' => $reply_markup
         ]);
-      //  $this->triggerCommand("contact");
 
     }
 }

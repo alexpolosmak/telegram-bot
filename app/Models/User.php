@@ -26,6 +26,12 @@ class User extends Authenticatable
 
     public function getUser($chatId): array
     {
-        return (User::query()->where("chat_id", "=", $chatId)->get())->toArray()[0];
+        $user=User::query()->where("chat_id", "=", $chatId)->get();
+        Cache::put("data123",$user);
+        if($user->all()==[]){
+
+            return [];
+        }
+        return $user->toArray()[0];
     }
 }

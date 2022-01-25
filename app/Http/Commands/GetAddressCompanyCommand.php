@@ -20,11 +20,5 @@ class GetAddressCompanyCommand extends Command
     public function handle()
     {
         $this->getCompanyAddressForOrder->sendAddresses($this->update["message"]["chat"]["id"]);
-//        $this->replyWithMessage([
-//            'chat_id' => $this->update["message"]["chat"]["id"],
-//            'text'=>"Address was saved",
-//
-//        ]);
-
     }
 }

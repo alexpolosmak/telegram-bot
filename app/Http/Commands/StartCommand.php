@@ -25,6 +25,7 @@ class StartCommand extends Command
     public function handle()
     {
         $user = User::getUser($this->update["message"]["chat"]["id"]);
+        if($user!=[])
         App::setLocale($user["lang"]);
         $this->replyWithMessage(['text' => __("message.start_message_greeting")]);
         $this->replyWithMessage([
@@ -40,6 +41,6 @@ class StartCommand extends Command
         }
 
         $this->replyWithMessage(['text' => $response]);
-        $this->triggerCommand("language");
+        $this->triggerCommand("contact");
     }
 }

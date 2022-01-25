@@ -23,6 +23,11 @@ class RequestContactSender
 
     public function sendRequestContact($chatId)
     {
+        $this->bot->sendChatAction([
+            'chat_id' => $chatId,
+            "action"=>"typing"
+        ]);
+
         $user=User::getUser($chatId);
         App::setLocale($user["lang"]);
         $button = Button::make([
