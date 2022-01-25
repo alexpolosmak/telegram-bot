@@ -4,6 +4,7 @@ namespace App\Http\Commands;
 
 use App\Models\User;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Cache;
 use Telegram\Bot\Commands\Command;
 use Telegram\Bot\Keyboard\Button;
 use Telegram\Bot\Keyboard\Keyboard;
@@ -52,5 +53,6 @@ class GetContactCommand extends Command
             'text' => __("message.contact"),
             'reply_markup' => $reply_markup
         ]);
+        Cache::put("inContect",$user);
     }
 }
