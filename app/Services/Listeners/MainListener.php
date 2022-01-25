@@ -35,14 +35,14 @@ class MainListener
     private $companyByCitySender;
     private $requestsAboutCompanyItems;
     private $categoriesByCompanySender;
-    private $nameItemConvertor;
+  //  private $nameItemConvertor;
     private $citiesListSender;
     private $newItemMessageSender;
     private $addressWasSavedSender;
     private $requestDeliveryTimeSender;
     private $timeConvertor;
     private $createOrderSender;
-    private $requestContactSender;
+   // private $requestContactSender;
     private $languageSender;
 
     public function __construct(

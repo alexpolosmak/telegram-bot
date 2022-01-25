@@ -46,7 +46,7 @@ class RequestContactSender
 
         ]);
 
-        return $this->bot->sendMessage([
+         $this->bot->sendMessage([
             'chat_id' => $chatId,
             'text' => __("message.contact"),
             'reply_markup' => $reply_markup
