@@ -42,8 +42,9 @@ class TelegramControler extends Controller
 
         $this->bot->addCommand(CreateOrderCommand::class);
         $this->bot->addCommand(GetAddressCompanyCommand::class);
-
+Cache::put("slavik",$this->bot->getWebhookUpdate());
         $this->bot->commandsHandler(true);
+
        $this->mainListener->listen($this->bot->getWebhookUpdate());
           // ProcessingTextMessageJob::dispatch($this->bot->getWebhookUpdate())->onQueue("default");
 

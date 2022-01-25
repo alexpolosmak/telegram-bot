@@ -105,6 +105,7 @@ Cache::put("ArrContect",true);
                 $this->languageSender->sendRequstOnLanguage($message["chat"]["id"]);
                 return true;
             }
+            return true;
         }
         if ($this->textIsLanguage($message)) {
             return true;
