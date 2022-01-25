@@ -28,8 +28,11 @@ class CreateOrderCommand extends  Command
     public function handle()
     {
         $user = User::getUser($this->update["message"]["chat"]["id"]);
-        if($user!=[])
-        App::setLocale($user["lang"]);
+        if ($user != []) {
+            App::setLocale($user["lang"]);
+        } else {
+            return;
+        }
         $message=$this->update->toArray();
         $this->createOrderRequest->createOrder($message["message"]["chat"]["id"]);
         $this->replyWithMessage([

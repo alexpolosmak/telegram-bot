@@ -29,8 +29,11 @@ class GetContactCommand extends Command
     public function handle()
     {
         $user = User::getUser($this->update["message"]["chat"]["id"]);
-        if($user!=[])
-        App::setLocale($user["lang"]);
+        if ($user != []) {
+            App::setLocale($user["lang"]);
+        } else {
+          //  return;
+        }
         $button=Button::make([
             "text"=>"share contact",
             "request_contact"=>true

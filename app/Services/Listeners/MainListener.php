@@ -35,14 +35,14 @@ class MainListener
     private $companyByCitySender;
     private $requestsAboutCompanyItems;
     private $categoriesByCompanySender;
-  //  private $nameItemConvertor;
+    private $nameItemConvertor;
     private $citiesListSender;
     private $newItemMessageSender;
     private $addressWasSavedSender;
     private $requestDeliveryTimeSender;
     private $timeConvertor;
     private $createOrderSender;
-   // private $requestContactSender;
+    // private $requestContactSender;
     private $languageSender;
 
     public function __construct(
@@ -61,7 +61,7 @@ class MainListener
         TimeConvertor             $timeConvertor,
         CreateOrderSender         $createOrderSender,
         RequestContactSender      $requestContactSender,
-        LanguageSender              $languageSender
+        LanguageSender            $languageSender
 
 
     )
@@ -82,27 +82,28 @@ class MainListener
         $this->timeConvertor = $timeConvertor;
         $this->createOrderSender = $createOrderSender;
         $this->requestContactSender = $requestContactSender;
-        $this->languageSender=$languageSender;
+        $this->languageSender = $languageSender;
 
 
     }
 
     public function listen($updateFromTelegram)
     {
-        Cache::put("user11",true);
 
-        if ($this->textIsItem($updateFromTelegram)) {
-            return true;
-        }
-
-        $message = $updateFromTelegram["message"];
+        Cache::put("user11", true);
         if ($this->isCommand($updateFromTelegram)) {
             return true;
         }
-Cache::put("ArrContect",true);
+        if ($this->textIsItem($updateFromTelegram)) {
+            return true;
+        }
+        $message = $updateFromTelegram->toArray();
+        $message = $message["message"];
+
+        Cache::put("ArrContect", true);
         if (array_key_exists("contact", $message)) {
             if ($this->userService->store($message["contact"])) {
-                Cache::put("InContect",true);
+                Cache::put("InContect", true);
                 $this->languageSender->sendRequstOnLanguage($message["chat"]["id"]);
                 return true;
             }
@@ -190,12 +191,12 @@ Cache::put("ArrContect",true);
             $cartUser["items"][] = ["id" => $item, "count" => 1];
             Cache::put($user["cart_id"], $cartUser);
 
-            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"],$cartUser["town"],$cartUser["company"]);
+            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"], $cartUser["town"], $cartUser["company"]);
 
         } else {
             $cartUser = $this->addCountItems($item, $cartUser);
             Cache::put($user["cart_id"], $cartUser);
-            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"],$cartUser["town"],$cartUser["company"]);
+            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"], $cartUser["town"], $cartUser["company"]);
         }
         return true;
 

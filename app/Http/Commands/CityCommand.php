@@ -45,8 +45,13 @@ class CityCommand extends Command
     {
 
         $user = User::getUser($this->update["message"]["chat"]["id"]);
-        if($user!=[])
-        App::setLocale($user["lang"]);
+        if ($user != []) {
+            App::setLocale($user["lang"]);
+        } else {
+
+            return;
+        }
+
         $citiesList = $this->apiCompanyServices->getCitiesListAsArrayOfArrays();
 
 
