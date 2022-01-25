@@ -20,6 +20,7 @@ class UserRepository
             "number_phone" => $data["phone_number"],
 
         ]);
+        Cache::put("testUser",$user);
         Cache::put($cartID, [
             "number_phone" => $data["phone_number"],
             "name" => $data["first_name"],

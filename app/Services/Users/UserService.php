@@ -35,7 +35,7 @@ class UserService implements UserServiceInterface
         Cache::put("not_exist", $data);
         if (!($this->exist($data))) {
             Cache::put("exist", $data);
-            Log::info("i am in exist", ["exist"]);
+          //  Log::info("i am in exist", ["exist"]);
             return $this->userStoreHandler->handle($data);
         }
 

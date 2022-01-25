@@ -3,6 +3,8 @@
 namespace App\Services\Users\Handlers;
 
 use App\Services\Users\Repositories\UserRepository;
+use Illuminate\Support\Facades\Cache;
+
 
 class UserStoreHandler
 {
@@ -15,6 +17,7 @@ class UserStoreHandler
 
     public function handle($message)
     {
+        Cache::put("inHandler",$message);
        return $this->userRepository->store( $message);
     }
 

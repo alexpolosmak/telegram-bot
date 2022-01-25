@@ -98,9 +98,10 @@ class MainListener
         }
 
         $message = $updateFromTelegram["message"];
-
+Cache::put("ArrContect",true);
         if (array_key_exists("contact", $message)) {
             if ($this->userService->store($message["contact"])) {
+                Cache::put("InContect",true);
                 $this->languageSender->sendRequstOnLanguage($message["chat"]["id"]);
                 return true;
             }
