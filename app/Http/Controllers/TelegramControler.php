@@ -35,7 +35,7 @@ class TelegramControler extends Controller
      */
     public function update()
     {
-        Cache::put("slavik",$this->bot->getWebhookUpdate());
+        Cache::put("slavik1",$this->bot->getWebhookUpdate());
 //        $this->bot->addCommand(StartCommand::class);
 //        $this->bot->addCommand(SetLanguage::class);
 //        $this->bot->addCommand(GetContactCommand::class);
