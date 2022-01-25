@@ -90,14 +90,15 @@ class MainListener
     public function listen($updateFromTelegram)
     {
         Cache::put("user11",true);
-        if ($this->isCommand($updateFromTelegram)) {
-            return true;
-        }
+
         if ($this->textIsItem($updateFromTelegram)) {
             return true;
         }
 
         $message = $updateFromTelegram["message"];
+        if ($this->isCommand($updateFromTelegram)) {
+            return true;
+        }
 Cache::put("ArrContect",true);
         if (array_key_exists("contact", $message)) {
             if ($this->userService->store($message["contact"])) {
