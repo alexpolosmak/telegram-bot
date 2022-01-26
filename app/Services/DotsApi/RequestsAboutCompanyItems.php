@@ -25,7 +25,7 @@ private $requestsAboutCities;
     }
 
 
-    private function getItemsList(string $companyId)
+    private function getItemsList(string $companyId,$lang="en")
     {
 
         $response = $this->client->get(
@@ -36,7 +36,7 @@ private $requestsAboutCities;
                     'Api-Account-Token' => config("configPermission")["Api_Account_Token"],
                     'Content-Type' => config("configPermission")["Content_Type"],
                     'Accept' => config("configPermission")["Accept"],
-                    "Api-Lang" => "ua"
+                    "Api-Lang" => $lang
 
                 ],
                 'query' => [
@@ -51,16 +51,14 @@ private $requestsAboutCities;
 
     }
 
-    public function getItemsListAsArrayByCompanyId(string $companyId)
+    public function getItemsListAsArrayByCompanyId(string $companyId,$lang="en")
     {
-
-
-        return $this->getItemsList($companyId);
+        return $this->getItemsList($companyId,$lang);
     }
 
-    public function getItemsNameList(string $companyId)
+    public function getItemsNameList(string $companyId,$lang)
     {
-        $categoriesListWithItems = $this->getItemsList($companyId);
+        $categoriesListWithItems = $this->getItemsList($companyId,$lang);
         $itemList = [];
         foreach ($categoriesListWithItems as $category) {
             $category = (array)$category;
@@ -74,10 +72,10 @@ private $requestsAboutCities;
         return $itemList;
     }
 
-    public function getNamesOfCategoriesAsArrayOfArrays(string $companyId)
+    public function getNamesOfCategoriesAsArrayOfArrays(string $companyId,$lang="en")
     {
         Cache::put("lan12","fs");
-        $categoriesListWithItems = $this->getItemsList($companyId);
+        $categoriesListWithItems = $this->getItemsList($companyId,$lang);
         $categories = [];
         foreach ($categoriesListWithItems as $category) {
             $category = (array)$category;
@@ -87,9 +85,10 @@ private $requestsAboutCities;
         return $categories;
     }
 
-    public function getNamesOfCategories(string $companyId)
+    public function getNamesOfCategories(string $companyId,$lang="en")
     {
-        $categoriesListWithItems = $this->getItemsList($companyId);
+      //  Cache::put("lang",$lang);
+        $categoriesListWithItems = $this->getItemsList($companyId,$lang);
         $categories = [];
         foreach ($categoriesListWithItems as $category) {
             $category = (array)$category;
@@ -99,15 +98,15 @@ private $requestsAboutCities;
         return $categories;
     }
 
-    public function getNameItemByIdItem($cityName,$companyName, $itemId)
+    public function getNameItemByIdItem($cityName,$companyName, $itemId,$lang="en")
     {
 
         Cache::put("cityName1",$cityName);
         Cache::put("companyName1",$companyName);
         Cache::put("itemId1",$itemId);
-        $cityId = $this->requestsAboutCompanies->getCityId($cityName);
+        $cityId = $this->requestsAboutCompanies->getCityId($cityName,$lang);
         Cache::put("cityId1",$cityId);
-        $companyList=  $this->requestsAboutCompanies->getCompanyListAsArrayWithId($cityName);
+        $companyList=  $this->requestsAboutCompanies->getCompanyListAsArrayWithId($cityName,$lang);
         Cache::put("companyList1",$companyList);
         $companyId="";
         foreach ($companyList as $key=>$company){
@@ -116,7 +115,7 @@ private $requestsAboutCities;
             }
         }
         Cache::put("companyId1",$companyId);
-        $itemList=$this->getItemsListAsArrayByCompanyId($companyId);
+        $itemList=$this->getItemsListAsArrayByCompanyId($companyId,$lang);
         foreach ($itemList as $category){
             Cache::put("category1",$category);
             foreach ($category->items as $item){

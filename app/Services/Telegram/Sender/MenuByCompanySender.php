@@ -27,7 +27,7 @@ class MenuByCompanySender
         $this->bot = $bot->getBot();
     }
 
-    public function sendMenuByCompany($companyId, $chatId, $categoryName)
+    public function sendMenuByCompany($companyId, $chatId, $categoryName,$lang)
     {
         $this->bot->sendChatAction([
             'chat_id' => $chatId,
@@ -36,7 +36,7 @@ class MenuByCompanySender
 
         $user = User::getUser($chatId);
         App::setLocale($user["lang"]);
-        $listCategoriesWithItems = $this->requestsAboutCompanyItems->getItemsListAsArrayByCompanyId($companyId);
+        $listCategoriesWithItems = $this->requestsAboutCompanyItems->getItemsListAsArrayByCompanyId($companyId,$lang);
 
 
         foreach ($listCategoriesWithItems as $categoryWithItems) {

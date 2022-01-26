@@ -34,9 +34,9 @@ class SetLanguage extends Command
 
 
         $languages = [
-            ["english"],
-            ["ukrainian"],
-            ["russian"]
+            ["English"],
+            ["Ukrainian"],
+            ["Russian"]
         ];
 
 

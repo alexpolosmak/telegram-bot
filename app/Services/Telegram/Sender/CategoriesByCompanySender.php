@@ -30,7 +30,7 @@ class CategoriesByCompanySender
         ]);
 
         App::setLocale($lang);
-        $categories = $this->requestsAboutCompanyItems->getNamesOfCategoriesAsArrayOfArrays($companyId);
+        $categories = $this->requestsAboutCompanyItems->getNamesOfCategoriesAsArrayOfArrays($companyId,$lang);
 
         $this->bot->sendMessage([
             'chat_id' => $chatId,

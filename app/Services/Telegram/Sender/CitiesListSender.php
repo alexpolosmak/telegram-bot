@@ -27,13 +27,14 @@ class CitiesListSender
 
     public function sendCitiesList($chatId)
     {
-        $user=User::getUser($chatId);
-        App::setLocale($user["lang"]);
-        $citiesList = $this->apiCompanyServices->getCitiesListAsArrayOfArrays();
-
+        $user = User::getUser($chatId);
+        if ($user != []) {
+            App::setLocale($user["lang"]);
+            $citiesList = $this->apiCompanyServices->getCitiesListAsArrayOfArrays($user["lang"]);
+        }
         $this->bot->sendChatAction([
             'chat_id' => $chatId,
-            "action"=>"typing"
+            "action" => "typing"
         ]);
 
         $reply_markup = Keyboard::button([
@@ -46,7 +47,7 @@ class CitiesListSender
 
         ]);
 
-        return  $this->bot->sendMessage([
+        return $this->bot->sendMessage([
             'chat_id' => $chatId,
             'text' => __("message.enter_city"),
             'reply_markup' => $reply_markup

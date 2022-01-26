@@ -21,9 +21,9 @@ class RequestsAboutCompanies
     }
 
 
-    public function getCompanyList(string $city)
+    public function getCompanyList(string $city,string $lang="en")
     {
-        $city = $this->getCityId($city);
+        $city = $this->getCityId($city,$lang);
         //  dd($city);
         $response = $this->client->get(
             "https://clients-api.dots.live/api/v2/cities/$city/companies",
@@ -33,7 +33,7 @@ class RequestsAboutCompanies
                     'Api-Account-Token' => config("configPermission")["Api_Account_Token"],
                     'Content-Type' => config("configPermission")["Content_Type"],
                     'Accept' => config("configPermission")["Accept"],
-                  'Api-Lang' => "ua"
+                  'Api-Lang' => $lang
                 ],
                 'query' => [
                     'v' => '2.0.0',
@@ -47,10 +47,10 @@ class RequestsAboutCompanies
 
     }
 
-    public function getCompaniesListAsArrayByCity(string $city)
+    public function getCompaniesListAsArrayByCity(string $city,$lang="en")
     {
 
-        $body = $this->getCompanyList($city);
+        $body = $this->getCompanyList($city,$lang);
         Cache::put("bod",$body);
         $companyList = [];
         foreach ($body as $company) {
@@ -60,10 +60,10 @@ class RequestsAboutCompanies
         return $companyList;
     }
 
-    public function getCompanyListByCityAsArrayOfArrays(string $city)
+    public function getCompanyListByCityAsArrayOfArrays(string $city,string $lang="en")
     {
 
-        $body = $this->getCompanyList($city);
+        $body = $this->getCompanyList($city,$lang);
         $companiesList = [];
         foreach ($body as $company) {
             $company = (array)$company;
@@ -73,9 +73,9 @@ class RequestsAboutCompanies
         return $companiesList;
     }
 
-    public function getCityId(string $city)
+    public function getCityId(string $city,string $lang="en")
     {
-        $cities = $this->requestAboutCities->getCitiesListAsArrayWithId();
+        $cities = $this->requestAboutCities->getCitiesListAsArrayWithId($lang);
         // dd($cities);
         foreach ($cities as $key => $item) {
             if ($item == $city) {
@@ -85,9 +85,9 @@ class RequestsAboutCompanies
         //return false;
     }
 
-    public function getCompanyListAsArrayWithId(string $city)
+    public function getCompanyListAsArrayWithId(string $city,string $lang="en")
     {
-        $body = $this->getCompanyList($city);
+        $body = $this->getCompanyList($city,$lang);
 
         $companiesList = [];
         foreach ($body as $company) {
@@ -99,9 +99,9 @@ class RequestsAboutCompanies
 
     }
 
-    public function getCompanyIdByCompanyName($companyName, $cityName)
+    public function getCompanyIdByCompanyName($companyName, $cityName,$lang="en")
     {
-        $companiesListWithIds = $this->getCompanyListAsArrayWithId($cityName);
+        $companiesListWithIds = $this->getCompanyListAsArrayWithId($cityName,$lang);
  //  dd($companyName);
         foreach ($companiesListWithIds as $id => $city) {
 
@@ -113,10 +113,10 @@ class RequestsAboutCompanies
 
     }
 
-    public function getCompanyAddresses($companyName, $cityName)
+    public function getCompanyAddresses($companyName, $cityName,$lang)
     {
-        $companyId = $this->getCompanyIdByCompanyName($companyName, $cityName);
-        $addressList = $this->getAddressList($companyId);
+        $companyId = $this->getCompanyIdByCompanyName($companyName, $cityName,$lang);
+        $addressList = $this->getAddressList($companyId,$lang);
 
         $resultAddressList = [];
         foreach ($addressList as $address) {
@@ -127,10 +127,10 @@ class RequestsAboutCompanies
         return $resultAddressList;
 
     }
-    public function getCompanyAddressesHowArray($companyName, $cityName)
+    public function getCompanyAddressesHowArray($companyName, $cityName,$lang="en")
     {
-        $companyId = $this->getCompanyIdByCompanyName($companyName, $cityName);
-        $addressList = $this->getAddressList($companyId);
+        $companyId = $this->getCompanyIdByCompanyName($companyName, $cityName,$lang);
+        $addressList = $this->getAddressList($companyId,$lang);
         $resultAddressList = [];
         foreach ($addressList as $address) {
             $address = (array)$address;
@@ -141,7 +141,7 @@ class RequestsAboutCompanies
 
     }
 
-    public function getInfoAboutCompany($companyId)
+    public function getInfoAboutCompany($companyId,$lang)
     {
         $response = $this->client->get(
             "https://clients-api.dots.live/api/v2/companies/$companyId?v=2.0.0",
@@ -152,7 +152,7 @@ class RequestsAboutCompanies
                     'Content-Type' => config("configPermission")["Content_Type"],
                     'Accept' => config("configPermission")["Accept"],
                     'Api-Auth-Token' => config("configPermission")["Api_Account_Token"],
-                    'Api-Lang' => "ua"
+                    'Api-Lang' => $lang
 
                 ],
                 'query' => [
@@ -166,15 +166,15 @@ class RequestsAboutCompanies
         return $body;
 
     }
-    public function getAddressList($companyId){
+    public function getAddressList($companyId,$lang){
 
-        return ($this->getInfoAboutCompany($companyId))["addresses"];
+        return ($this->getInfoAboutCompany($companyId,$lang))["addresses"];
     }
 
-    public function getAddressIdByAddressName($addressName, $companyName, $cityName)
+    public function getAddressIdByAddressName($addressName, $companyName, $cityName,$lang)
     {
-        $companyId = $this->getCompanyIdByCompanyName($companyName, $cityName);
-        $addressList = $this->getAddressList($companyId);
+        $companyId = $this->getCompanyIdByCompanyName($companyName, $cityName,$lang);
+        $addressList = $this->getAddressList($companyId,$lang);
 
         foreach ($addressList as $address) {
             $address = (array)$address;
@@ -187,9 +187,9 @@ class RequestsAboutCompanies
         }
     }
 
-    public function getScheduleListForCompanyByName(string $nameCompany,string $cityName){
-       $companyId= $this->getCompanyIdByCompanyName($nameCompany,$cityName);
-       $info=$this->getInfoAboutCompany($companyId);
+    public function getScheduleListForCompanyByName(string $nameCompany,string $cityName,$lang){
+       $companyId= $this->getCompanyIdByCompanyName($nameCompany,$cityName,$lang);
+       $info=$this->getInfoAboutCompany($companyId,$lang);
        //Cache::put("info2",$info["schedule"][0]->id);
        return $info["schedule"];
     }

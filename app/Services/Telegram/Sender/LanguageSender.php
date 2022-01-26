@@ -27,9 +27,9 @@ class LanguageSender
 
 
         $languages = [
-            ["english"],
-            ["ukrainian"],
-            ["russian"]
+            ["English"],
+            ["Ukrainian"],
+            ["Russian"]
         ];
 
 

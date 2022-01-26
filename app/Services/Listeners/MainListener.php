@@ -90,11 +90,14 @@ class MainListener
     public function listen($updateFromTelegram)
     {
 
-        Cache::put("user11", true);
+        Cache::put("user11", $updateFromTelegram);
         if ($this->isCommand($updateFromTelegram)) {
             return true;
         }
         if ($this->textIsItem($updateFromTelegram)) {
+            return true;
+        }
+        if($this->inputTimeInUnixFormat($updateFromTelegram)){
             return true;
         }
         $message = $updateFromTelegram->toArray();
@@ -112,30 +115,41 @@ class MainListener
         if ($this->textIsLanguage($message)) {
             return true;
         }
+
         if ($this->textIsCity($message)) {
             return true;
         }
+        Cache::put("afterLan1", $message);
         if ($this->textIsCompany($message)) {
             return true;
         }
+        Cache::put("afterLan2", $message);
         if ($this->textIsCategory($message)) {
             return true;
         }
+        Cache::put("afterLan31", $message);
         if ($this->textIsAddress($message)) {
             return true;
         }
+
+        Cache::put("afterLan4", $message);
         if ($this->textIsDeliveryTime($message)) {
             return true;
         }
+        Cache::put("afterLan5", $message);
         $this->sendMessageAboutFailedRequest($message);
+        Cache::put("afterLan6", $message);
         return true;
     }
 
     private function textIsCity($message)
     {
-        if (in_array($message["text"], $this->requestsAboutCities->getCitiesListAsArray())) {
-            $user = User::getUser($message["chat"]["id"]);
-            $cart = Cache::get($user["cart_id"]);
+        $user = User::getUser($message["chat"]["id"]);
+        if ($user == []) {
+            return false;
+        }
+        $cart = Cache::get($user["cart_id"]);
+        if (in_array($message["text"], $this->requestsAboutCities->getCitiesListAsArray($user['lang']))) {
             $cart["town"] = $message["text"];
             Cache::put($user["cart_id"], $cart);
             $this->companyByCitySender->sendCompaniesListByCity($message["text"], $message["chat"]["id"], $user["lang"]);
@@ -147,15 +161,20 @@ class MainListener
     private function textIsCompany($message)
     {
         $user = User::getUser($message["chat"]["id"]);
+        if ($user == [])
+            return false;
 
         $cartUser = Cache::get($user["cart_id"]);
-        if (in_array($message["text"], $this->requestsAboutCompanies->getCompaniesListAsArrayByCity($cartUser["town"]))) {
+        if ($cartUser["town"] == "")
+            return false;
+        if (in_array($message["text"], $this->requestsAboutCompanies->getCompaniesListAsArrayByCity($cartUser["town"], $user["lang"]))) {
             $cartUser["company"] = $message["text"];
             Cache::put($user["cart_id"], $cartUser);
             $this->categoriesByCompanySender->sendCategoriesByCompany(
                 $this->getCompanyIdByName(
                     $message["text"],
-                    $cartUser["town"]
+                    $cartUser["town"],
+                    $user["lang"]
                 ),
                 $user["chat_id"],
                 $user["lang"]
@@ -168,10 +187,18 @@ class MainListener
     private function textIsCategory($message)
     {
         $user = User::getUser($message["chat"]["id"]);
+        if ($user == []) {
+            return false;
+        }
         $cartUser = Cache::get($user["cart_id"]);
-        if (in_array($message["text"], $this->requestsAboutCompanyItems->getNamesOfCategories($this->getCompanyIdByName($cartUser["company"], $cartUser["town"])))) {
+        if ($cartUser["town"] == "" || $cartUser["company"] == "") {
+            return false;
+        }
+        Cache::put("ctct", $this->requestsAboutCompanyItems->getNamesOfCategories($this->getCompanyIdByName($cartUser["company"], $cartUser["town"], $user["lang"])));
+        if (in_array($message["text"], $this->requestsAboutCompanyItems->getNamesOfCategories($this->getCompanyIdByName($cartUser["company"], $cartUser["town"], $user["lang"]), $user["lang"]))) {
             $categoryName = $message["text"];
-            $this->menuByCompanySender->sendMenuByCompany($this->getCompanyIdByName($cartUser["company"], $cartUser["town"]), $user["chat_id"], $categoryName);
+            $this->menuByCompanySender->sendMenuByCompany($this->getCompanyIdByName($cartUser["company"], $cartUser["town"], $user["lang"]), $user["chat_id"], $categoryName, $user["lang"]);
+            Cache::put("ctct1", $message);
             return true;
         }
 
@@ -182,6 +209,8 @@ class MainListener
         $message = $message->toArray();
         if (!array_key_exists("callback_query", $message))
             return false;
+        if(is_numeric($message["callback_query"]["data"]))
+            return false;
 
         $user = User::getUser($message["callback_query"]["from"]["id"]);
         $cartUser = Cache::get($user["cart_id"]);
@@ -191,12 +220,12 @@ class MainListener
             $cartUser["items"][] = ["id" => $item, "count" => 1];
             Cache::put($user["cart_id"], $cartUser);
 
-            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"], $cartUser["town"], $cartUser["company"]);
+            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"], $cartUser["town"], $cartUser["company"], $user["lang"]);
 
         } else {
             $cartUser = $this->addCountItems($item, $cartUser);
             Cache::put($user["cart_id"], $cartUser);
-            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"], $cartUser["town"], $cartUser["company"]);
+            $this->newItemMessageSender->sendMessageAboutNewItem($user["chat_id"], $message["callback_query"]["data"], $cartUser["town"], $cartUser["company"], $user["lang"]);
         }
         return true;
 
@@ -209,9 +238,9 @@ class MainListener
         return (User::query()->where("chat_id", "=", $chatId)->get())->toArray();
     }
 
-    private function getCompanyIdByName($companyName, $cityName)
+    private function getCompanyIdByName($companyName, $cityName, $lang)
     {
-        $companies = $this->requestsAboutCompanies->getCompanyListAsArrayWithId($cityName);
+        $companies = $this->requestsAboutCompanies->getCompanyListAsArrayWithId($cityName, $lang);
         foreach ($companies as $key => $company) {
             if ($company == $companyName) {
                 return $key;
@@ -246,9 +275,14 @@ class MainListener
 
     private function textIsAddress($message)
     {
-        $user = $this->getUser($message["chat"]["id"])[0];
+        $user = User::getUser($message["chat"]["id"]);
+        if ($user == []) {
+            return false;
+        }
         $cartUser = Cache::get($user["cart_id"]);
-        $addresses = $this->requestsAboutCompanies->getCompanyAddressesHowArray($cartUser["company"], $cartUser["town"]);
+        if ($cartUser["town"] == "" || $cartUser["company"] == "")
+            return false;
+        $addresses = $this->requestsAboutCompanies->getCompanyAddressesHowArray($cartUser["company"], $cartUser["town"], $user["lang"]);
         $address = $message['text'];
 
         if (in_array($address, $addresses)) {
@@ -267,19 +301,19 @@ class MainListener
     private function textIsLanguage($message)
     {
 
-        if ($message["text"] == "english") {
+        if ($message["text"] == "English") {
             User::query()->where("chat_id", "=", $message["chat"]["id"])->update([
                 "lang" => "en"
             ]);
             return $this->citiesListSender->sendCitiesList($message["chat"]["id"]);
         }
-        if ($message["text"] == "ukrainian") {
+        if ($message["text"] == "Ukrainian") {
             User::query()->where("chat_id", "=", $message["chat"]["id"])->update([
                 "lang" => "ua"
             ]);
             return $this->citiesListSender->sendCitiesList($message["chat"]["id"]);
         }
-        if ($message["text"] == "russian") {
+        if ($message["text"] == "Russian") {
             User::query()->where("chat_id", "=", $message["chat"]["id"])->update([
                 "lang" => "ru"
             ]);
@@ -293,13 +327,27 @@ class MainListener
     private function textIsDeliveryTime($message)
     {
 
-        $timeFormat = "/(min.)$|(хв.)$|(мин.)$/";
-        if (!preg_match($timeFormat, $message["text"])) {
+        $timeFormatWithoutDate = "/^[0-9][0-9]:[0-9][0-9]$/";
+        $timeFormatWithDate = "/^[0-9][0-9]:[0-9][0-9] [0-9][0-9].[0-9][0-9]$/";
+        //   $timeFormat = "/(min.)$|(хв.)$|(мин.)$/";
+        if (!preg_match($timeFormatWithoutDate, $message["text"]) && !preg_match($timeFormatWithDate, $message["text"])) {
             return false;
         }
+        date_default_timezone_set('Europe/Kiev');
         $user = $this->getUser($message["chat"]["id"])[0];
         $cartUser = Cache::get($user["cart_id"]);
-        $cartUser["deliveryTime"] = $this->timeConvertor->convertTimeFromTimeDeliveryToUnix($message["text"]);
+       if( str_contains($message["text"],".")){
+           $time= $this->timeConvertor->convertTimeFromHourAndMinutesAndDaysFormat($message["text"])+ 90;
+       }else{
+           $time = $this->timeConvertor->convertTimeFromHourAndMinutesFormat($message["text"])+ 90;
+       }
+
+        if ($time < time()) {
+            return false;
+        }
+        $cartUser["deliveryTime"] =$time;
+
+            Cache::put("delTime", $cartUser["deliveryTime"]);
         Cache::put($user["cart_id"], $cartUser);
         $this->createOrderSender->sendInviteForCreateOrder($message["chat"]["id"]);
         return true;
@@ -327,5 +375,32 @@ class MainListener
             "text" => __("message.failed_request")
 
         ]);
+    }
+
+
+    private function inputTimeInUnixFormat($message){
+        if (!array_key_exists("callback_query", $message))
+            return false;
+        date_default_timezone_set('Europe/Kiev');
+        $message=$message->toArray();
+        if(!is_numeric($message["callback_query"]["data"])){
+            return false;
+        }
+        if(date("Y",$message["callback_query"]["data"])!=date("Y")){
+            return false;
+        }
+        if($message["callback_query"]["data"]<time()){
+            return false;
+        }
+
+        $user=User::getUser($message["callback_query"]["from"]["id"]);
+        Cache::put("userr",$user);
+        $key=$user["cart_id"];
+        Cache::put("key",$key);
+        $cartUser=Cache::get($user["cart_id"]);
+        Cache::put("userc",$cartUser);
+        $cartUser["deliveryTime"]=$message["callback_query"]["data"];
+        return true;
+
     }
 }

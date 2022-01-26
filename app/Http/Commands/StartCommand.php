@@ -33,14 +33,14 @@ class StartCommand extends Command
             'text' =>__("message.start_message")
         ]);
         $this->replyWithChatAction(['action' => Actions::TYPING]);
-        $commands = $this->getTelegram()->getCommands();
+       // $commands = $this->getTelegram()->getCommands();
 
-        $response = '';
-        foreach ($commands as $name => $command) {
-            $response .= sprintf('/%s - %s' . PHP_EOL, $name, $command->getDescription());
-        }
+//        $response = '';
+//        foreach ($commands as $name => $command) {
+//            $response .= sprintf('/%s - %s' . PHP_EOL, $name, $command->getDescription());
+//        }
 
-        $this->replyWithMessage(['text' => $response]);
+       // $this->replyWithMessage(['text' => $response]);
         $this->triggerCommand("contact");
     }
 }

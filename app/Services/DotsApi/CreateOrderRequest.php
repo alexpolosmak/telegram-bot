@@ -29,18 +29,18 @@ class CreateOrderRequest
     {
 
         $cartUser = User::getCartUser($chatId);
-
-        $cityId = $this->requestAboutCities->getCityIdByCitName($cartUser["town"]);
-        $companyId = $this->requestAboutCompanies->getCompanyIdByCompanyName($cartUser["company"], $cartUser["town"]);
-        $companyAddressId = $this->requestAboutCompanies->getAddressIdByAddressName($cartUser["addressCompany"], $cartUser["company"], $cartUser["town"]);
+$user=User::getUser($chatId);
+        $cityId = $this->requestAboutCities->getCityIdByCitName($cartUser["town"],$user["lang"]);
+        $companyId = $this->requestAboutCompanies->getCompanyIdByCompanyName($cartUser["company"], $cartUser["town"],$user["lang"]);
+        $companyAddressId = $this->requestAboutCompanies->getAddressIdByAddressName($cartUser["addressCompany"], $cartUser["company"], $cartUser["town"],$user["lang"]);
         //  dd(($this->requestAboutCompanies->getInfoAboutCompany($companyId))["deliveryTime"]);
         //$deliveryTime = $this->getDeliveryTime($companyId);
         //$deliveryTime = $this->convertorTime->convertTimeFromTimeDeliveryToUnix($deliveryTime);
 
         $data['orderFields'] = [
-            'cityId' => $this->requestAboutCities->getCityIdByCitName($cartUser["town"]),
-            'companyId' => $this->requestAboutCompanies->getCompanyIdByCompanyName($cartUser["company"], $cartUser["town"]),
-            "companyAddressId" => $this->requestAboutCompanies->getAddressIdByAddressName($cartUser["addressCompany"], $cartUser["company"], $cartUser["town"]),
+            'cityId' => $this->requestAboutCities->getCityIdByCitName($cartUser["town"],$user["lang"]),
+            'companyId' => $this->requestAboutCompanies->getCompanyIdByCompanyName($cartUser["company"], $cartUser["town"],$user["lang"]),
+            "companyAddressId" => $this->requestAboutCompanies->getAddressIdByAddressName($cartUser["addressCompany"], $cartUser["company"], $cartUser["town"],$user["lang"]),
             'userName' => $cartUser["name"],
             'userPhone' => $cartUser["number_phone"],
             'deliveryType' => 2,
@@ -48,6 +48,7 @@ class CreateOrderRequest
             'deliveryTime' => $cartUser["deliveryTime"],
             'cartItems' => $cartUser["items"]
         ];
+
 
 
         Cache::put("order", json_encode($data));
@@ -77,11 +78,11 @@ class CreateOrderRequest
 
     }
 
-    private function getDeliveryTime($companyId)
-    {
-
-
-        return ($this->requestAboutCompanies->getInfoAboutCompany($companyId))["deliveryTime"] == null ? 0 : (($this->requestAboutCompanies->getInfoAboutCompany($companyId))["deliveryTime"])->label;
-    }
+//    private function getDeliveryTime($companyId,$lang)
+//    {
+//
+//
+//        return ($this->requestAboutCompanies->getInfoAboutCompany($companyId,$))["deliveryTime"] == null ? 0 : (($this->requestAboutCompanies->getInfoAboutCompany($companyId))["deliveryTime"])->label;
+//    }
 
 }

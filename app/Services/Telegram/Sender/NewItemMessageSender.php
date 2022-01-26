@@ -28,10 +28,10 @@ private $requestsAboutCompanyItems;
 
     }
 
-    public function sendMessageAboutNewItem($chatId, $idItem,$cityName,$companyName)
+    public function sendMessageAboutNewItem($chatId, $idItem,$cityName,$companyName,$lang)
     {
 
-      $nameItem=  $this->requestsAboutCompanyItems->getNameItemByIdItem($cityName,$companyName,$idItem);
+      $nameItem=  $this->requestsAboutCompanyItems->getNameItemByIdItem($cityName,$companyName,$idItem,$lang);
 
 
         $this->bot->sendChatAction([

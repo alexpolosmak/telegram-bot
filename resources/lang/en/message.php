@@ -32,10 +32,27 @@ return [
     "deliveryTime" => "Enter the number of minutes in format {count} min. from this time in which you want to receive your order.
         Today the company works from ",
     "to" => " to ",
-    "company_not_working_today" => "\nSorry, today company is not working.\nPlease be aware of this if you would like to pre-order.",
+    "company_not_working_today" => "\nSorry, today company is not working.\nPlease be aware of this if you would like to pre-order.\n
+ If you want to pre-order just enter the delivery time in the format 00:00 00.00.\nIf you place an order today, you do not need to enter the day/month.",
     "choose_company" => "Choose company",
     "failed_request" => "I dont understand what do you want.Check if the input is correct",
-    "choose_company_address"=>"Choose company address where you want get your order"
+    "choose_company_address"=>"Choose company address where you want get your order",
+"exist_one_example_company_adress"=>"This company has only one pickup point. You can pick up your order here: ",
+    "in_one_hour"=>"1 hour",
+    "in_two_hours"=>"2 hours",
+    "in_tree_hours"=>"3 hours",
+    "in_four_hours"=>"4 hours",
+    "own_delivery_time"=>"other time",
+    "f_a_c"=>"f.a.c",
+    "next_day_schedule_"=>"Tomorrow company works from ",
+    "days_where_company_not_works"=>"Company not working in this days: ",
+    "monday"=>"Monday ",
+    "tuesday"=>"Tuesday ",
+    "wednesday"=>"Wednesday ",
+    "thursday"=>"Thursday ",
+    "friday"=>"Friday ",
+    "saturday"=>"Saturday ",
+    "sunday"=>"Sunday ",
 
 
 ];
