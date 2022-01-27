@@ -328,9 +328,12 @@ class MainListener
     {
 
         $timeFormatWithoutDate = "/^[0-9][0-9]:[0-9][0-9]$/";
-        $timeFormatWithDate = "/^[0-9][0-9]:[0-9][0-9] [0-9][0-9].[0-9][0-9]$/";
+        $timeFormatWithDate = "/^[0-9][0-9]:[0-9][0-9] [0-9][0-9]\.[0-9][0-9]$/";
         //   $timeFormat = "/(min.)$|(хв.)$|(мин.)$/";
-        if (!preg_match($timeFormatWithoutDate, $message["text"]) && !preg_match($timeFormatWithDate, $message["text"])) {
+        if (
+            (preg_match($timeFormatWithoutDate, $message["text"]) == preg_match($timeFormatWithDate, $message["text"]))
+        ) {
+            //Cache::put("inPreg123",!preg_match($timeFormatWithoutDate, $message["text"]));
             return false;
         }
         date_default_timezone_set('Europe/Kiev');
